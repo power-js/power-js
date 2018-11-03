@@ -1,0 +1,90 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`vdom #h should contain children of mixed types 1`] = `
+VNode {
+  "children": Array [
+    VNode {
+      "children": Array [
+        VNode {
+          "children": Array [
+            "Hello",
+          ],
+          "props": Object {
+            "power-id": 2,
+          },
+          "tagName": "div",
+        },
+        VNode {
+          "children": Array [
+            VNode {
+              "children": Array [
+                "World",
+              ],
+              "props": Object {
+                "power-id": 3,
+              },
+              "tagName": "span",
+            },
+          ],
+          "props": Object {
+            "power-id": 4,
+          },
+          "tagName": "div",
+        },
+      ],
+      "props": Object {
+        "power-id": 5,
+      },
+      "tagName": [Function],
+    },
+    "",
+  ],
+  "props": Object {
+    "id": "test",
+    "power-id": 6,
+  },
+  "tagName": [Function],
+}
+`;
+
+exports[`vdom #h should handle rendering of invalid children (boolean) 1`] = `
+VNode {
+  "children": Array [
+    VNode {
+      "children": Array [
+        "Hello",
+      ],
+      "props": Object {
+        "power-id": 7,
+      },
+      "tagName": [Function],
+    },
+    "",
+  ],
+  "props": Object {
+    "power-id": 8,
+  },
+  "tagName": [Function],
+}
+`;
+
+exports[`vdom #h should handle rendering of invalid children (number) 1`] = `
+VNode {
+  "children": Array [
+    VNode {
+      "children": Array [
+        "Hello",
+      ],
+      "props": Object {
+        "power-id": 9,
+      },
+      "tagName": [Function],
+    },
+    "1",
+  ],
+  "props": Object {
+    "power-id": 10,
+  },
+  "tagName": [Function],
+}
+`;

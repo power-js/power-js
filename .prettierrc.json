@@ -1,0 +1,7 @@
+{
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "singleQuote": true,
+  "parser": "babylon",
+  "printWidth": 180
+}

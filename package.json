@@ -1,0 +1,97 @@
+{
+  "name": "@power-js/core",
+  "version": "0.0.1",
+  "description": "A powerful JavaScript library for building web components.",
+  "main": "dist/power.js",
+  "scripts": {
+    "precommit": "lint-staged",
+    "prod": "rollup --c",
+    "dev": "rollup --c --configDebug",
+    "dev:watch": "rollup --c --configDebug -w",
+    "bundle": "npm run prod && npm run dev",
+    "lint": "eslint -c ./.eslintrc --fix ./src --ext .js",
+    "test": "jest --coverage",
+    "test:coverage": "jest --coverage && open ./coverage/lcov-report/index.html",
+    "test:watch": "jest --watch",
+    "prepare": "npm run bundle && npm run test",
+    "docs": "set NODE_ENV=docs && documentation build src/** -f md -o docs/readme.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janmarkuslanger/powerjs.git"
+  },
+  "author": "Jan-Markus Langer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/janmarkuslanger/powerjs/issues"
+  },
+  "homepage": "https://github.com/janmarkuslanger/powerjs#readme",
+  "devDependencies": {
+    "@babel/core": "^7.0.1",
+    "@babel/plugin-transform-react-jsx": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^9.0.0",
+    "babel-jest": "^23.6.0",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^5.6.0",
+    "eslint-config-prettier": "^2.6.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-prettier": "^2.3.1",
+    "husky": "^0.14.3",
+    "jest": "^23.6.0",
+    "jest-sandbox": "^1.1.2",
+    "lint-staged": "^7.3.0",
+    "prettier": "^1.14.3",
+    "regenerator-runtime": "^0.12.1",
+    "rollup": "^0.66.6",
+    "rollup-plugin-alias": "^1.4.0",
+    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-buble": "^0.19.4",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-eslint": "^5.0.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-replace": "^2.1.0",
+    "rollup-plugin-strip": "^1.2.0",
+    "rollup-plugin-uglify": "^6.0.0"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/index.js"
+    ],
+    "testRegex": "tests/.*.js$",
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "transform": {
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+    },
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ]
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {},
+  "keywords": [
+    "jsx",
+    "virtual",
+    "dom",
+    "vdom",
+    "web",
+    "components",
+    "components",
+    "react-like",
+    "react",
+    "inferno",
+    "preact",
+    "javascript"
+  ]
+}
