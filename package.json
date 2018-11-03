@@ -1,6 +1,6 @@
 {
   "name": "@power-js/core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A powerful JavaScript library for building web components.",
   "main": "dist/power.js",
   "scripts": {
