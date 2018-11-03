@@ -538,9 +538,6 @@
         }
 
         var newElement = createElement(child, Component);
-        Component._count += 1;
-        newElement.setAttribute(DATA_NODE_ATTRIBUTE, Component._count);
-        child.props[DATA_NODE_ATTRIBUTE] = Component._count;
         element.appendChild(newElement);
         continue;
       }
