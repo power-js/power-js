@@ -2,7 +2,7 @@ import { extend } from '../utils/objects';
 import { isEqual, isFunction, isObject } from '../utils/is';
 import { DATA_COMPONENT_ATTRIBUTE } from '../constants';
 import { createElement } from '../dom/createElement';
-import { diff } from '../vdom/diff';
+import { diff } from '../diff/diff';
 import { proxy } from './proxy';
 
 /**
