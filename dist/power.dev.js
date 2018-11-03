@@ -441,47 +441,6 @@
   };
 
   /**
-   * Removes a child node from the DOM
-   * @private
-   * @param {HTMLElement}
-   */
-  var removeNode = function removeNode(child) {
-    if (child && child.parentNode) {
-      child.parentNode.removeChild(child);
-    }
-  };
-
-  /**
-   * working on difference between 2 vnodes
-   * @private
-   * @param {Object}  oldVNode
-   * @param {Object}  newVNode
-   * @param {Class}   Component
-   */
-
-  var diff = function diff(oldVNode, newVNode, Component) {
-    // get the element id
-    var powerId = oldVNode.props[DATA_NODE_ATTRIBUTE]; // check if newVNode props is null
-
-    if (newVNode.props === null) {
-      newVNode.props = {};
-    } // merge the node id
-
-
-    newVNode.props[DATA_NODE_ATTRIBUTE] = oldVNode.props[DATA_NODE_ATTRIBUTE]; // get the dom element to the vnode
-
-    var element = Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]")); // compare the tag
-
-    if (oldVNode.tagName !== newVNode.tagName) {
-      console.log('tagName changed');
-    } // compare props
-
-
-    propsDiff(oldVNode.props, newVNode.props, element); // compare children
-
-    childrenDiff(oldVNode.children, newVNode.children, element, Component);
-  };
-  /**
    * checks out the difference between 2 objects
    * and merges it into the component element
    * @private
@@ -518,6 +477,25 @@
       }
     }
   };
+
+  /**
+   * Removes a child node from the DOM
+   * @private
+   * @param {HTMLElement}
+   */
+  var removeNode = function removeNode(child) {
+    if (child && child.parentNode) {
+      child.parentNode.removeChild(child);
+    }
+  };
+
+  /**
+   * Replaces one child node of the specified node with another
+   * @private
+   * @param {HTMLElement} oldChild
+   * @param {HTMLElement} newChild
+   */
+
   /**
    * checks out the difference between 2 Arrays
    * and merges it into the component element
@@ -566,6 +544,37 @@
       childLength -= 1;
       childLengthDiff -= 1;
     }
+  };
+
+  /**
+   * working on difference between 2 vnodes
+   * @private
+   * @param {Object}  oldVNode
+   * @param {Object}  newVNode
+   * @param {Class}   Component
+   */
+
+  var diff = function diff(oldVNode, newVNode, Component) {
+    // get the element id
+    var powerId = oldVNode.props[DATA_NODE_ATTRIBUTE]; // check if newVNode props is null
+
+    if (newVNode.props === null) {
+      newVNode.props = {};
+    } // merge the node id
+
+
+    newVNode.props[DATA_NODE_ATTRIBUTE] = oldVNode.props[DATA_NODE_ATTRIBUTE]; // get the dom element to the vnode
+
+    var element = Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]")); // compare the tag
+
+    if (oldVNode.tagName !== newVNode.tagName) {
+      console.log('tagName changed');
+    } // compare props
+
+
+    propsDiff(oldVNode.props, newVNode.props, element); // compare children
+
+    childrenDiff(oldVNode.children, newVNode.children, element, Component);
   };
 
   var ARRAY_MODIFIERS = ['push', 'pop', 'shift', 'unshift', 'splice'];
