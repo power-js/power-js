@@ -14,7 +14,6 @@
     "test:unit": "jest --coverage",
     "test:coverage": "jest --coverage && open ./coverage/lcov-report/index.html",
     "test:watch": "jest --watch",
-    "prepare": "npm run bundle && npm run test",
     "docs": "set NODE_ENV=docs && documentation build src/** -f md -o docs/readme.md"
   },
   "repository": {
