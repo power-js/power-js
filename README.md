@@ -18,22 +18,22 @@ This library was designed as a lightweight React-like solution with a smaller fo
 We aren't sure what this library will evolve into but we wanted to start with "good bones". Please help us define what this can be by opening some PRs or submitting ideas!
 
 
-⚬ **Fast Rendering**
+**Fast Rendering**
 <br>Virtual DOM for detecting deltas and isolating renders.
 
-⚬ **Minimalistic**
+**Minimalistic**
 <br>Library makes use of only 3 primary functions.
 
-⚬ **Bundle Size**
+**Bundle Size**
 <br>Library is extremely small, just 2.3k (gzipped)
 
-⚬ **No Dependencies**
+**No Dependencies**
 <br>A standalone library with no dependencies.
 
-⚬ **Components**
+**Components**
 <br>Allows you to build components with an encapsulated state.
 
-⚬ **React-like API**
+**React-like API**
 <br>If you know how you use React then you already know how to use PowerJS.
 
 ## Links
