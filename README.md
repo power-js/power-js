@@ -2,6 +2,13 @@
 
 <p align="center"><strong>A powerful JavaScript library for building web components</strong></p>
 
+<p align="center">  
+  <img src="https://travis-ci.com/power-js/power-js.svg?branch=master">
+  <img src="https://codecov.io/gh/power-js/power-js/branch/master/graph/badge.svg">
+  <img src="https://img.shields.io/github/size/power-js/power-js/dist/power.js.svg">
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
+</p>
+
 ---
 
 ## Why PowerJS?
