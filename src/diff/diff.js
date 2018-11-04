@@ -24,11 +24,6 @@ export const diff = (oldVNode, newVNode, Component) => {
   // get the dom element to the vnode
   const element = Component.node.querySelector(`[${DATA_NODE_ATTRIBUTE}="${powerId}"]`);
 
-  // compare the tag
-  if (oldVNode.tagName !== newVNode.tagName) {
-    console.log('tagName changed');
-  }
-
   // compare props
   propsDiff(oldVNode.props, newVNode.props, element);
 
