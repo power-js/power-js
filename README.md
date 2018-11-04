@@ -1,4 +1,4 @@
-<p align="center" ><a href="https://github.com/janmarkuslanger/powerjs"><img alt="PowerJS is pra Logo" src="https://camo.githubusercontent.com/9bb8be7b58dc3dc9722117a2ef2e59a46272770e/68747470733a2f2f63646e2e7261776769742e636f6d2f6a616e6d61726b75736c616e6765722f706f7765726a732f66643538323436352f6173736574732f6c6f676f2e737667" width="300" height="auto"/></a></p>
+<p align="center" ><a href="https://github.com/power-js/power-js"><img alt="PowerJS" src="https://user-images.githubusercontent.com/1918732/47967954-4538fe00-e018-11e8-9ca6-6f7a433c2196.png" width="500" height="auto"/></a></p>
 
 <p align="center"><strong>A powerful JavaScript library for building web components</strong></p>
 
