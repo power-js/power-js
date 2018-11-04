@@ -19,7 +19,7 @@ export const render = (model, root) => {
     throw 'You MUST provide a valid DOM element as your root.';
   }
 
-  // check if model is neither a vdom or component
+  // handle a class being passed in
   if (!isVNode(model) && !model._power) {
     return render(new model(), root);
   }
@@ -39,4 +39,6 @@ export const render = (model, root) => {
   if (model._power && model.componentDidMount) {
     model.componentDidMount(model);
   }
+
+  return model;
 };
