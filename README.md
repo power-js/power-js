@@ -12,6 +12,10 @@
 ---
 
 ## Why PowerJS?
+This library was designed as a lightweight React-like solution with a smaller footprint and faster performance. This is **not** a React replacement nor was it ever intended to be. Our goal was to provide a similar interface to prevent having to learn yet another front-end library. 
+
+We aren't sure what this library will evolve into but we wanted to start with "good bones". Please help us define what this can be by opening some PRs or submitting ideas!
+
 
 **Fast Rendering**
 <br>Virtual DOM for detecting deltas and isolating renders.
@@ -43,7 +47,6 @@ You can use PowerJS with just place the script into your document, but if you pr
 
 PowerJS is provided as a UMD library to accommodate any loading method.
 
-
 Included via `script`
 ```js
 <script src="power.js"></script>
@@ -66,7 +69,7 @@ const Power = require('@power-js/core');
 
 ```
 
-## Get started
+## Getting started
 
 There is a <a href="https://github.com/janmarkuslanger/powerjs-starter">repository</a> on github which helps you to get started.
 
