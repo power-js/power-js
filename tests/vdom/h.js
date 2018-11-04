@@ -9,15 +9,16 @@ class MyComponent extends Component {
 
 describe('vdom', () => {
   describe('#h', () => {
-    it('should return a VNode with the expected attributes', () => {
+    it('should return a new VNode', () => {
       const component = <MyComponent />;
 
       expect(component).toHaveProperty('tagName');
       expect(component).toHaveProperty('children');
       expect(component).toHaveProperty('props');
+      expect(component.constructor.name).toEqual('VNode');
     });
 
-    it('should contain children of mixed types', () => {
+    it('should handle processing children of mixed types', () => {
       const component = (
         <MyComponent id="test">
           <MyComponent>
@@ -25,6 +26,7 @@ describe('vdom', () => {
             <div>{[<span>World</span>]}</div>
           </MyComponent>
           {true}
+          {() => 'hello'}
         </MyComponent>
       );
 
@@ -35,7 +37,7 @@ describe('vdom', () => {
       expect(component).toMatchSnapshot();
     });
 
-    it('should handle rendering of invalid children (boolean)', () => {
+    it('should drop children that are of type boolean', () => {
       const component = (
         <MyComponent>
           <MyComponent>Hello</MyComponent>
@@ -48,7 +50,7 @@ describe('vdom', () => {
       expect(component).toMatchSnapshot();
     });
 
-    it('should handle rendering of invalid children (number)', () => {
+    it('should cast children that are numbers to strings', () => {
       const component = (
         <MyComponent>
           <MyComponent>Hello</MyComponent>

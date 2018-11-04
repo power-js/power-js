@@ -1,5 +1,4 @@
 import { isHtml, isVNode, isFunction } from '../utils/is';
-import { createElement } from '../dom/createElement';
 
 /**
  * Renders a component or vnodes in the given root
@@ -16,7 +15,7 @@ export const render = (model, root) => {
     return render(new model.tagName(model.props), _root);
   }
 
-  // check if model is neither a vdom or component
+  // handle a class being passed in
   if (!isVNode(model) && !model._power) {
     return render(new model(), _root);
   }
@@ -27,7 +26,7 @@ export const render = (model, root) => {
   }
 
   // convert the vnodes / component into real dom elements
-  const domTree = model._power ? model.create() : createElement(model);
+  const domTree = model.create();
 
   if (isHtml(domTree)) {
     _root.appendChild(domTree);
@@ -36,4 +35,6 @@ export const render = (model, root) => {
   if (model._power && model.componentDidMount) {
     model.componentDidMount(model);
   }
+
+  return model;
 };

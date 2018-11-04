@@ -1,4 +1,3 @@
-import { isObject } from '../utils/is';
 import { decorateElement } from './decorateElement';
 import { appendChildren } from './appendChildren';
 
@@ -13,7 +12,7 @@ export const createElement = (vnode) => {
   // create the element
   const element = document.createElement(vnode.tagName.name || vnode.tagName);
 
-  if (isObject(vnode.props)) {
+  if (vnode.props && Object.keys(vnode.props).length) {
     decorateElement(element, vnode.props);
   }
 

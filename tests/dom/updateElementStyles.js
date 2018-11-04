@@ -4,7 +4,9 @@ describe('dom', () => {
   describe('#updateElementStyles', () => {
     it('should update the elements style (object)', () => {
       const element = document.createElement('div');
-      const oldStyle = {};
+      const oldStyle = {
+        fontSize: '21px'
+      };
       const newStyle = {
         fontSize: '14px',
         backgroundColor: '#000'
