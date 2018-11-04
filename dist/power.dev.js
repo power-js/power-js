@@ -205,6 +205,89 @@
       isString = methods.isString;
 
   /**
+   * Renders a component or vnodes in the given root
+   * @public
+   * @param {Object|Function} model
+   * @param {DOM Element}     root
+   */
+
+  var render = function render(model, root) {
+    // assign document.body if no root is given
+    var _root = root || document.body; // JSX will transform Component into functions
+
+
+    if (isFunction(model.tagName)) {
+      // TODO: better checking
+      return render(new model.tagName(model.props), _root);
+    } // handle a class being passed in
+
+
+    if (!isVNode(model) && !model._power) {
+      return render(new model(), _root);
+    } // check if model is a component
+
+
+    if (model._power && model.componentWillMount) {
+      model.componentWillMount(model);
+    } // convert the vnodes / component into real dom elements
+
+
+    var domTree = model.create();
+
+    if (isHtml(domTree)) {
+      _root.appendChild(domTree);
+    }
+
+    if (model._power && model.componentDidMount) {
+      model.componentDidMount(model);
+    }
+
+    return model;
+  };
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
+  /**
+   * Shallow copies all properties from the config object to the target object
+   * @param  {Object} target    The receiving object you want to apply the source objects to
+   * @param  {Object} arguments The source object(s) containing the new or updated properties
+   * @return {Object}           The target object
+   */
+  var extend = function extend(target) {
+    var sources = [].slice.call(arguments, 1);
+
+    for (var i = 0, k = sources.length; i < k; i++) {
+      var props = sources[i];
+
+      for (var prop in props) {
+        target[prop] = props[prop];
+      }
+    }
+
+    return target;
+  };
+
+  /**
    * Assigns a callback function to the event type on the specificed element that
    * will be called whenever the event is triggered
    * @private
@@ -346,7 +429,7 @@
     // create the element
     var element = document.createElement(vnode.tagName.name || vnode.tagName);
 
-    if (isObject(vnode.props)) {
+    if (vnode.props && Object.keys(vnode.props).length) {
       decorateElement(element, vnode.props);
     }
 
@@ -355,87 +438,6 @@
     }
 
     return element;
-  };
-
-  /**
-   * Renders a component or vnodes in the given root
-   * @public
-   * @param {Object|Function} model
-   * @param {DOM Element}     root
-   */
-
-  var render = function render(model, root) {
-    // assign document.body if no root is given
-    var _root = root || document.body; // JSX will transform Component into functions
-
-
-    if (isFunction(model.tagName)) {
-      // TODO: better checking
-      return render(new model.tagName(model.props), _root);
-    } // check if model is neither a vdom or component
-
-
-    if (!isVNode(model) && !model._power) {
-      return render(new model(), _root);
-    } // check if model is a component
-
-
-    if (model._power && model.componentWillMount) {
-      model.componentWillMount(model);
-    } // convert the vnodes / component into real dom elements
-
-
-    var domTree = model._power ? model.create() : createElement(model);
-
-    if (isHtml(domTree)) {
-      _root.appendChild(domTree);
-    }
-
-    if (model._power && model.componentDidMount) {
-      model.componentDidMount(model);
-    }
-  };
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  function _defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  function _createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties(Constructor, staticProps);
-    return Constructor;
-  }
-
-  /**
-   * Shallow copies all properties from the config object to the target object
-   * @param  {Object} target    The receiving object you want to apply the source objects to
-   * @param  {Object} arguments The source object(s) containing the new or updated properties
-   * @return {Object}           The target object
-   */
-  var extend = function extend(target) {
-    var sources = [].slice.call(arguments, 1);
-
-    for (var i = 0, k = sources.length; i < k; i++) {
-      var props = sources[i];
-
-      for (var prop in props) {
-        target[prop] = props[prop];
-      }
-    }
-
-    return target;
   };
 
   /**
@@ -563,12 +565,7 @@
 
     newVNode.props[DATA_NODE_ATTRIBUTE] = oldVNode.props[DATA_NODE_ATTRIBUTE]; // get the dom element to the vnode
 
-    var element = Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]")); // compare the tag
-
-    if (oldVNode.tagName !== newVNode.tagName) {
-      console.log('tagName changed');
-    } // compare props
-
+    var element = Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]")); // compare props
 
     propsDiff(oldVNode.props, newVNode.props, element); // compare children
 

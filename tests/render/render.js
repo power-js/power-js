@@ -30,7 +30,7 @@ describe('render', () => {
       const spyDid = jest.spyOn(MyComponent.prototype, 'componentDidMount');
       const spyWill = jest.spyOn(MyComponent.prototype, 'componentWillMount');
 
-      render(<MyComponent />, document.body);
+      render(<MyComponent />);
 
       expect(componentDidMount).toHaveBeenCalledTimes(1);
       expect(spyDid).toHaveBeenCalled();
@@ -40,10 +40,6 @@ describe('render', () => {
 
       spyDid.mockRestore();
       spyWill.mockRestore();
-    });
-
-    it('should throw if the root element is invalid', () => {
-      expect(() => render(<MyComponent />, null)).toThrowError('You MUST provide a valid DOM element as your root.');
     });
 
     it('should handle component classes (not vnodes)', () => {
