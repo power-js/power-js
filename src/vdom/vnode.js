@@ -19,8 +19,10 @@ export function VNode(tagName, props, children) {
   this.children = children || [];
   this.props = props || {};
 
+  // increment counter
   _counter += 1;
 
+  // assign _counter to props
   this.props[DATA_NODE_ATTRIBUTE] = _counter;
 
   return this;

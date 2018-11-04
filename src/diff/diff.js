@@ -1,6 +1,8 @@
 import { propsDiff } from './propsDiff';
 import { childrenDiff } from './childrenDiff';
 import { DATA_NODE_ATTRIBUTE } from '../constants';
+import { isKeyedList } from '../utils/is';
+import { keyChildrenDiff } from './keyChildrenDiff';
 
 /**
  * working on difference between 2 vnodes
@@ -28,5 +30,9 @@ export const diff = (oldVNode, newVNode, Component) => {
   propsDiff(oldVNode.props, newVNode.props, element);
 
   // compare children
-  childrenDiff(oldVNode.children, newVNode.children, element, Component);
+  if (isKeyedList(newVNode.children)) {
+    keyChildrenDiff(oldVNode.children, newVNode.children, element);
+  } else {
+    childrenDiff(oldVNode.children, newVNode.children, element, Component);
+  }
 };

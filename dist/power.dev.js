@@ -36,8 +36,10 @@
   function VNode(tagName, props, children) {
     this.tagName = tagName || 'div';
     this.children = children || [];
-    this.props = props || {};
-    _counter += 1;
+    this.props = props || {}; // increment counter
+
+    _counter += 1; // assign _counter to props
+
     this.props[DATA_NODE_ATTRIBUTE] = _counter;
     return this;
   }
@@ -157,6 +159,22 @@
 
   var isVNode = function isVNode(vnode) {
     return vnode && vnode.constructor === VNode;
+  };
+
+  /**
+   * @param   {Array}   list
+   * @return  {Boolean}
+   */
+  var isKeyedList = function isKeyedList(list) {
+    if (list.length && list[0].props) {
+      if (list[0].props.hasOwnProperty('key')) {
+        return true;
+      }
+
+      return false;
+    }
+
+    return false;
   };
 
   /**
@@ -547,6 +565,14 @@
   };
 
   /**
+   * diffing keyed lists
+   * @param {Array}       oldChilds
+   * @param {Array}       newChilds
+   * @param {DOM Element} element
+   */
+  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, element, Component) {};
+
+  /**
    * working on difference between 2 vnodes
    * @private
    * @param {Object}  oldVNode
@@ -569,7 +595,11 @@
 
     propsDiff(oldVNode.props, newVNode.props, element); // compare children
 
-    childrenDiff(oldVNode.children, newVNode.children, element, Component);
+    if (isKeyedList(newVNode.children)) {
+      keyChildrenDiff(oldVNode.children, newVNode.children, element);
+    } else {
+      childrenDiff(oldVNode.children, newVNode.children, element, Component);
+    }
   };
 
   var ARRAY_MODIFIERS = ['push', 'pop', 'shift', 'unshift', 'splice'];
