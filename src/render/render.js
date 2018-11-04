@@ -8,20 +8,17 @@ import { createElement } from '../dom/createElement';
  * @param {DOM Element}     root
  */
 export const render = (model, root) => {
+  // assign document.body if no root is given
+  const _root = root || document.body;
   // JSX will transform Component into functions
   if (isFunction(model.tagName)) {
     // TODO: better checking
-    return render(new model.tagName(model.props), root);
-  }
-
-  // check if a root is given
-  if (!isHtml(root)) {
-    throw 'You MUST provide a valid DOM element as your root.';
+    return render(new model.tagName(model.props), _root);
   }
 
   // check if model is neither a vdom or component
   if (!isVNode(model) && !model._power) {
-    return render(new model(), root);
+    return render(new model(), _root);
   }
 
   // check if model is a component
@@ -33,7 +30,7 @@ export const render = (model, root) => {
   const domTree = model._power ? model.create() : createElement(model);
 
   if (isHtml(domTree)) {
-    root.appendChild(domTree);
+    _root.appendChild(domTree);
   }
 
   if (model._power && model.componentDidMount) {
