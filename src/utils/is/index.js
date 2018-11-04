@@ -2,7 +2,7 @@ import { isElementAttribute } from './isElementAttribute';
 import { isEqual } from './isEqual';
 import { isEvent } from './isEvent';
 import { isHtml } from './isHtml';
-import { isVNode } from './isVnode';
+import { isVNode } from './isVNode';
 
 import { isArray, isBoolean, isError, isFunction, isNull, isNumber, isObject, isRegExp, isString, isUndefined } from './common';
 
