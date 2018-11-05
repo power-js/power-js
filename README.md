@@ -135,7 +135,7 @@ We have a Code of Conduct that we expect collaborators to adhere to. Please read
 
 ### [Contributing Guide](CONTRIBUTING.md)
 
-Read our [contributing guide](CONTRIBUTING.md) to learn about our development process. Feel free to fork this project and create a PR!
+Read our [contributing guide](CONTRIBUTING.md) to learn about our development process.
 
 ### Core Contributors
 
