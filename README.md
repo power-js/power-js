@@ -1,4 +1,4 @@
-<p align="center" ><a href="https://github.com/power-js/power-js"><img alt="PowerJS" src="https://user-images.githubusercontent.com/1918732/47973868-7c7cce80-e05b-11e8-9049-d0bdf6d1bc21.png" width="500" height="auto"/></a></p>
+<p align="center" ><a href="https://github.com/power-js/power-js"><img alt="PowerJS" src="https://user-images.githubusercontent.com/1918732/47975313-295a4a00-e062-11e8-8ae7-2e6124405f9c.png" width="500" height="auto"/></a></p>
 
 <p align="center"><strong>A powerful JavaScript library for building web components</strong></p>
 
