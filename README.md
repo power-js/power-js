@@ -42,7 +42,7 @@ We aren't sure what this library will evolve into but we wanted to start with "g
 - <a href="https://github.com/power-js/todo-app">A simple Todo app</a>
 
 ## Before you start
-You can use PowerJS with just place the script into your document, but if you prefer html Syntax you should take a look at JSX. There is a <a href="https://babeljs.io/docs/en/babel-plugin-transform-react-jsx/">Babel plugin</a> which transforms your JSX Syntax into a VDom.
+If you would to use JSX with PowerJS you'll need to install this [Babel Plugin](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx) which will convert the JSX into a Virtual DOM. There's an example of this plugin config in the Todo app [here](https://github.com/power-js/todo-app/blob/master/.babelrc).
 
 ## Installation
 
