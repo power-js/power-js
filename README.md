@@ -143,4 +143,4 @@ Read our [contributing guide](CONTRIBUTING.md) to learn about our development pr
 
 ### License
 
-[MIT](./LICENSE).
+[MIT](./LICENSE)
