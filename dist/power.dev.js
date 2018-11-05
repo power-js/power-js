@@ -58,7 +58,7 @@
    * @return {Object}         A new virtual node
    */
 
-  function h(tagName, props) {
+  function h(tagName, props, childrens, key) {
     var children = [];
 
     for (var i = arguments.length; i-- > 2;) {
@@ -570,7 +570,19 @@
    * @param {Array}       newChilds
    * @param {DOM Element} element
    */
-  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, element, Component) {};
+
+  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, element, Component) {
+    var oldKeys = oldChilds.map(function (a) {
+      return a.props.key;
+    }); //[DATA_NODE_ATTRIBUTE]);
+
+    var newKeys = newChilds.map(function (a) {
+      return a.props.key;
+    }); //[DATA_NODE_ATTRIBUTE]);
+    // oldChilds.forEach()
+
+    console.log(oldKeys, newKeys, element, Component);
+  };
 
   /**
    * working on difference between 2 vnodes
@@ -596,7 +608,7 @@
     propsDiff(oldVNode.props, newVNode.props, element); // compare children
 
     if (isKeyedList(newVNode.children)) {
-      keyChildrenDiff(oldVNode.children, newVNode.children, element);
+      keyChildrenDiff(oldVNode.children, newVNode.children, element, Component);
     } else {
       childrenDiff(oldVNode.children, newVNode.children, element, Component);
     }

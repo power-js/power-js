@@ -31,7 +31,7 @@ export const diff = (oldVNode, newVNode, Component) => {
 
   // compare children
   if (isKeyedList(newVNode.children)) {
-    keyChildrenDiff(oldVNode.children, newVNode.children, element);
+    keyChildrenDiff(oldVNode.children, newVNode.children, element, Component);
   } else {
     childrenDiff(oldVNode.children, newVNode.children, element, Component);
   }

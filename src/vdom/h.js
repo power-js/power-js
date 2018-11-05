@@ -13,7 +13,7 @@ const stack = [];
  * @param  {Array}  args    Array of child nodes
  * @return {Object}         A new virtual node
  */
-export function h(tagName, props) {
+export function h(tagName, props, childrens, key) {
   const children = [];
 
   for (let i = arguments.length; i-- > 2; ) {
