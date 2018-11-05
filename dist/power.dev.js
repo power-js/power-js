@@ -381,7 +381,7 @@
         continue;
       }
 
-      if (isElementAttribute(element, prop)) {
+      if (isElementAttribute(element, prop) || prop === 'key') {
         element.setAttribute(jsxProps[prop] || prop, props[prop]);
         continue;
       }
@@ -568,9 +568,40 @@
    * diffing keyed lists
    * @param {Array}       oldChilds
    * @param {Array}       newChilds
-   * @param {DOM Element} element
+   * @param {DOM Element} parent
    */
-  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, element, Component) {};
+
+  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, parent, Component) {
+    // get every old key
+    var oldKeys = oldChilds.map(function (child) {
+      return child.props.key;
+    }); // get every new key
+
+    var newKeys = newChilds.map(function (child) {
+      return child.props.key;
+    });
+
+    if (oldKeys.length > newKeys.length) {
+      var differenceKeys = oldKeys.filter(function (key) {
+        return newKeys.indexOf(key) < 0;
+      });
+      differenceKeys.forEach(function (diff) {
+        removeNode(parent.querySelector("[key=\"".concat(diff, "\"]")));
+      });
+    } else if (oldKeys.length < newKeys.length) {
+      var _differenceKeys = newKeys.filter(function (key) {
+        return oldKeys.indexOf(key) < 0;
+      });
+
+      _differenceKeys.forEach(function (key) {
+        newChilds.forEach(function (child) {
+          if (child.props.key === key) {
+            parent.appendChild(createElement(child));
+          }
+        });
+      });
+    }
+  };
 
   /**
    * working on difference between 2 vnodes

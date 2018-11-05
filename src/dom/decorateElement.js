@@ -22,7 +22,7 @@ export const decorateElement = (element, props) => {
       continue;
     }
 
-    if (isElementAttribute(element, prop)) {
+    if (isElementAttribute(element, prop) || prop === 'key') {
       element.setAttribute(jsxProps[prop] || prop, props[prop]);
       continue;
     }

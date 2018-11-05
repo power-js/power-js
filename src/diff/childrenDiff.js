@@ -1,4 +1,4 @@
-import { isString, isVNode, isArray } from '../utils/is';
+import { isString, isVNode } from '../utils/is';
 import { createElement } from '../dom/createElement';
 import { removeNode } from '../utils/dom';
 import { DATA_NODE_ATTRIBUTE } from '../constants';
