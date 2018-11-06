@@ -1,4 +1,4 @@
-<p align="center" ><a href="https://github.com/power-js/power-js"><img alt="PowerJS" src="https://user-images.githubusercontent.com/1918732/47967954-4538fe00-e018-11e8-9ca6-6f7a433c2196.png" width="500" height="auto"/></a></p>
+<p align="center" ><a href="https://github.com/power-js/power-js"><img alt="PowerJS" src="https://user-images.githubusercontent.com/1918732/47975313-295a4a00-e062-11e8-8ae7-2e6124405f9c.png" width="500" height="auto"/></a></p>
 
 <p align="center"><strong>A powerful JavaScript library for building web components</strong></p>
 
@@ -25,7 +25,7 @@ We aren't sure what this library will evolve into but we wanted to start with "g
 <br>Library makes use of only 3 primary functions.
 
 **Bundle Size**
-<br>Library is extremely small, just 2.3k (gzipped)
+<br>Library is extremely small, just 2.2k (gzipped)
 
 **No Dependencies**
 <br>A standalone library with no dependencies.
@@ -39,15 +39,16 @@ We aren't sure what this library will evolve into but we wanted to start with "g
 ## Links
 
 - <a href="https://github.com/power-js/power-js/blob/master/CHANGELOG.md">Change log</a>
-- <a href="https://github.com/power-js/todo-app">Example TODO app</a>
+- <a href="https://github.com/power-js/todo-app">A simple Todo app</a>
 
 ## Before you start
-You can use PowerJS with just place the script into your document, but if you prefer html Syntax you should take a look at JSX. There is a <a href="https://babeljs.io/docs/en/babel-plugin-transform-react-jsx/">Babel plugin</a> which transforms your JSX Syntax into a VDom.
+If you would like to use JSX with PowerJS you'll need to install this [Babel Plugin](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx) which will convert the JSX into a Virtual DOM. There's an example of this plugin config in the Todo app [here](https://github.com/power-js/todo-app/blob/master/.babelrc).
 
 ## Installation
 
 PowerJS is provided as a UMD library to accommodate any loading method.
 
+### Script
 Included via `script`
 ```js
 <script src="power.js"></script>
@@ -58,27 +59,30 @@ const { h, Component, render } = power;
 // power.h, power.Component, power.render
 ```
 
-Included via `import`
+### NPM
+You'll need to install PowerJS via NPM
+```js
+npm install @power-js/core
+```
+
+Include via `import`
 ```js
 import Power from '@power-js/core';
 
 ```
 
-Included via `require`
+Include via `require`
 ```js
 const Power = require('@power-js/core');
 
 ```
 
-## Getting started
-
-There is a <a href="https://github.com/janmarkuslanger/powerjs-starter">repository</a> on github which helps you to get started.
-
-Here is a typical example for a counter component.
+## Example
+Here's an example of a simple counter component.
 
 JSX:
 
-```js
+```jsx
 import Power, { render, Component } from '@power-js/core';
 
 class Counter extends Component {
@@ -120,9 +124,23 @@ const myCounter = new Counter({ counter: 0 });
 render(myCounter, document.body);
 ```
 
-## Contributors
 
-Feel free to fork this project and PR!
+## Contributing
 
-| [<img src="https://avatars.githubusercontent.com/u/1918732?v=3" width="100px;"/><br /><sub><b>Dysfunc</b></sub>](https://github.com/dysfunc)<br />💻 👀 | [<img src="https://avatars.githubusercontent.com/u/26633123?v=3" width="100px;"/><br /><sub><b>Jan-Markus Langer</b></sub>](https://github.com/janmarkuslanger)<br />💻 👀 |
-| :---: | :---: |
+The purpose of this repo is to continue to evolve PowerJS as an open source project driven by its contributors and communal support. We appreciate all the support we've received, and look forward to working with many new faces. To get started contributing just review our contribution guide, code of conduct and open a PR.
+
+### [Code of Conduct](./CODE_OF_CONDUCT.md)
+
+We have a Code of Conduct that we expect collaborators to adhere to. Please read it [in its entirety](./CODE_OF_CONDUCT.md) so you understand our expectations of you and what is acceptable behavior.
+
+### [Contributing Guide](CONTRIBUTING.md)
+
+Read our [contributing guide](CONTRIBUTING.md) to learn about our development process.
+
+### Core Contributors
+
+[Jan-Markus Langer](https://github.com/janmarkuslanger) · [Dysfunc](https://github.com/dysfunc)
+
+### License
+
+[MIT](./LICENSE)

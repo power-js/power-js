@@ -162,22 +162,6 @@
   };
 
   /**
-   * @param   {Array}   list
-   * @return  {Boolean}
-   */
-  var isKeyedList = function isKeyedList(list) {
-    if (list.length && list[0].props) {
-      if (list[0].props.hasOwnProperty('key')) {
-        return true;
-      }
-
-      return false;
-    }
-
-    return false;
-  };
-
-  /**
    * class2type dictionary
    * @private
    * @type {Object}
@@ -381,7 +365,7 @@
         continue;
       }
 
-      if (isElementAttribute(element, prop)) {
+      if (isElementAttribute(element, prop) || prop === 'key') {
         element.setAttribute(jsxProps[prop] || prop, props[prop]);
         continue;
       }
@@ -446,13 +430,16 @@
   var createElement = function createElement(vnode) {
     // create the element
     var element = document.createElement(vnode.tagName.name || vnode.tagName);
+    var fragment = document.createDocumentFragment();
+
+    if (vnode.children && vnode.children.length) {
+      appendChildren(fragment, vnode.children);
+    }
+
+    element.appendChild(fragment);
 
     if (vnode.props && Object.keys(vnode.props).length) {
       decorateElement(element, vnode.props);
-    }
-
-    if (vnode.children && vnode.children.length) {
-      appendChildren(element, vnode.children);
     }
 
     return element;
@@ -568,20 +555,51 @@
    * diffing keyed lists
    * @param {Array}       oldChilds
    * @param {Array}       newChilds
-   * @param {DOM Element} element
+   * @param {DOM Element} parent
    */
 
-  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, element, Component) {
-    var oldKeys = oldChilds.map(function (a) {
-      return a.props.key;
-    }); //[DATA_NODE_ATTRIBUTE]);
+  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, parent, Component) {
+    // get every old key
+    var oldKeys = oldChilds.map(function (child) {
+      return child.props.key;
+    }); // get every new key
 
-    var newKeys = newChilds.map(function (a) {
-      return a.props.key;
-    }); //[DATA_NODE_ATTRIBUTE]);
-    // oldChilds.forEach()
+    var newKeys = newChilds.map(function (child) {
+      return child.props.key;
+    });
 
-    console.log(oldKeys, newKeys, element, Component);
+    if (oldKeys.length > newKeys.length) {
+      var differenceKeys = oldKeys.filter(function (key) {
+        return newKeys.indexOf(key) < 0;
+      });
+
+      if (differenceKeys.length === 1) {
+        var element = parent.querySelector("[key=\"".concat(differenceKeys[0], "\"]"));
+        parent.removeChild(element);
+      } else {
+        var keys = '';
+
+        for (var i = 0, k = differenceKeys.length; i < k; i++) {
+          keys += "[key=\"".concat(differenceKeys[i], "\"],");
+        }
+
+        parent.querySelectorAll(keys.slice(0, keys.length - 1)).forEach(function (child) {
+          return child.parentNode.removeChild(child);
+        });
+      }
+    } else if (oldKeys.length < newKeys.length) {
+      var _differenceKeys = newKeys.filter(function (key) {
+        return oldKeys.indexOf(key) < 0;
+      });
+
+      _differenceKeys.forEach(function (key) {
+        newChilds.forEach(function (child) {
+          if (child.props.key === key) {
+            parent.appendChild(createElement(child));
+          }
+        });
+      });
+    }
   };
 
   /**
@@ -607,7 +625,7 @@
 
     propsDiff(oldVNode.props, newVNode.props, element); // compare children
 
-    if (isKeyedList(newVNode.children)) {
+    if (newVNode.children.length && newVNode.children[0].props && newVNode.children[0].props.key) {
       keyChildrenDiff(oldVNode.children, newVNode.children, element, Component);
     } else {
       childrenDiff(oldVNode.children, newVNode.children, element, Component);
