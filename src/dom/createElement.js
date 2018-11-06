@@ -11,13 +11,16 @@ import { appendChildren } from './appendChildren';
 export const createElement = (vnode) => {
   // create the element
   const element = document.createElement(vnode.tagName.name || vnode.tagName);
+  const fragment = document.createDocumentFragment();
+
+  if (vnode.children && vnode.children.length) {
+    appendChildren(fragment, vnode.children);
+  }
+
+  element.appendChild(fragment);
 
   if (vnode.props && Object.keys(vnode.props).length) {
     decorateElement(element, vnode.props);
-  }
-
-  if (vnode.children && vnode.children.length) {
-    appendChildren(element, vnode.children);
   }
 
   return element;
