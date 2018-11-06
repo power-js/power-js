@@ -58,7 +58,7 @@
    * @return {Object}         A new virtual node
    */
 
-  function h(tagName, props, childrens, key) {
+  function h(tagName, props) {
     var children = [];
 
     for (var i = arguments.length; i-- > 2;) {
