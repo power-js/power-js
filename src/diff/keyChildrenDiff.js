@@ -1,4 +1,5 @@
 import { createElement } from '../dom/createElement';
+
 /**
  * diffing keyed lists
  * @param {Array}       oldChilds
@@ -14,18 +15,13 @@ export const keyChildrenDiff = (oldChilds, newChilds, parent, Component) => {
   if (oldKeys.length > newKeys.length) {
     const differenceKeys = oldKeys.filter((key) => newKeys.indexOf(key) < 0);
 
-    if(differenceKeys.length === 1){
-      const element = parent.querySelector(`[key="${differenceKeys[0]}"]`);
-      parent.removeChild(element);
-    }else{
-      let keys = '';
+    differenceKeys.forEach((diff) => {
+      const element = parent.querySelector(`[key="${diff}"]`);
 
-      for (let i = 0, k = differenceKeys.length; i < k; i++) {
-        keys += `[key="${differenceKeys[i]}"],`
+      if(element.parentNode){
+        element.parentNode.removeChild(element);
       }
-
-      parent.querySelectorAll(keys.slice(0, keys.length - 1)).forEach((child) => child.parentNode.removeChild(child));
-    }
+    });
   } else if (oldKeys.length < newKeys.length) {
     const differenceKeys = newKeys.filter((key) => oldKeys.indexOf(key) < 0);
 

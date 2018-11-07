@@ -2,6 +2,7 @@ import { propsDiff } from './propsDiff';
 import { childrenDiff } from './childrenDiff';
 import { DATA_NODE_ATTRIBUTE } from '../constants';
 import { keyChildrenDiff } from './keyChildrenDiff';
+import { isKeyedList } from '../utils/is';
 
 /**
  * working on difference between 2 vnodes
@@ -24,14 +25,15 @@ export const diff = (oldVNode, newVNode, Component) => {
 
   // get the dom element to the vnode
   const element = Component.node.querySelector(`[${DATA_NODE_ATTRIBUTE}="${powerId}"]`);
-
+  const newChildren = newVNode.children;
+  const oldChildren = oldVNode.children;
   // compare props
   propsDiff(oldVNode.props, newVNode.props, element);
 
   // compare children
-  if (newVNode.children.length && newVNode.children[0].props && newVNode.children[0].props.key) {
-    keyChildrenDiff(oldVNode.children, newVNode.children, element, Component);
+  if (isKeyedList(oldChildren, newChildren)) {
+    keyChildrenDiff(oldChildren, newChildren, element, Component);
   } else {
-    childrenDiff(oldVNode.children, newVNode.children, element, Component);
+    childrenDiff(oldChildren, newChildren, element, Component);
   }
 };
