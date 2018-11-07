@@ -1,6 +1,8 @@
 import { propsDiff } from './propsDiff';
 import { childrenDiff } from './childrenDiff';
-import { DATA_NODE_ATTRIBUTE } from '../constants';
+import { POWER_NODE_ATTRIBUTE } from '../constants';
+import { keyChildrenDiff } from './keyChildrenDiff';
+import { isKeyedList } from '../utils/is';
 
 /**
  * working on difference between 2 vnodes
@@ -11,7 +13,7 @@ import { DATA_NODE_ATTRIBUTE } from '../constants';
  */
 export const diff = (oldVNode, newVNode, Component) => {
   // get the element id
-  const powerId = oldVNode.props[DATA_NODE_ATTRIBUTE];
+  const powerId = oldVNode.props[POWER_NODE_ATTRIBUTE];
 
   // check if newVNode props is null
   if (newVNode.props === null) {
@@ -19,14 +21,19 @@ export const diff = (oldVNode, newVNode, Component) => {
   }
 
   // merge the node id
-  newVNode.props[DATA_NODE_ATTRIBUTE] = oldVNode.props[DATA_NODE_ATTRIBUTE];
+  newVNode.props[POWER_NODE_ATTRIBUTE] = powerId;
 
   // get the dom element to the vnode
-  const element = Component.node.querySelector(`[${DATA_NODE_ATTRIBUTE}="${powerId}"]`);
-
+  const element = Component.node.querySelector(`[${POWER_NODE_ATTRIBUTE}="${powerId}"]`);
+  const newChildren = newVNode.children;
+  const oldChildren = oldVNode.children;
   // compare props
   propsDiff(oldVNode.props, newVNode.props, element);
 
   // compare children
-  childrenDiff(oldVNode.children, newVNode.children, element, Component);
+  if (isKeyedList(oldChildren, newChildren)) {
+    keyChildrenDiff(oldChildren, newChildren, element);
+  } else {
+    childrenDiff(oldChildren, newChildren, element, Component);
+  }
 };

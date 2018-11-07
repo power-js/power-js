@@ -1,6 +1,6 @@
 import { addEventListener } from './addEventListener';
 import { updateElementStyles } from './updateElementStyles';
-import { isElementAttribute, isEvent } from '../utils/is';
+import { isElementAttribute, isEqual, isEvent } from '../utils/is';
 import { jsxProps } from '../vdom/jsxProps';
 
 /**
@@ -13,7 +13,10 @@ import { jsxProps } from '../vdom/jsxProps';
 export const decorateElement = (element, props) => {
   for (const prop in props) {
     if (prop === 'style') {
-      updateElementStyles(element, props[prop]);
+      if (!isEqual(element.style, props.style)) {
+        updateElementStyles(element, props[prop]);
+      }
+
       continue;
     }
 
@@ -22,9 +25,10 @@ export const decorateElement = (element, props) => {
       continue;
     }
 
-    if (isElementAttribute(element, prop)) {
-      element.setAttribute(jsxProps[prop] || prop, props[prop]);
-      continue;
+    if (isElementAttribute(element, prop) || prop === 'key') {
+      if (!element[prop] || props[prop] !== element[prop]) {
+        element.setAttribute(jsxProps[prop] || prop, props[prop]);
+      }
     }
   }
 };

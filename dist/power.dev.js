@@ -9,21 +9,21 @@
    * @private
    * @type {String}
    */
-  var DATA_COMPONENT_ATTRIBUTE = 'power-component';
+  var POWER_COMPONENT_ATTRIBUTE = 'power-component';
   /**
    * data node id
    * @private
    * @type {String}
    */
 
-  var DATA_NODE_ATTRIBUTE = 'power-id';
+  var POWER_NODE_ATTRIBUTE = 'power-id';
 
   /**
    * VNode Counter
    * @type {Number}
    */
 
-  var _counter = 0;
+  var counter = 0;
   /**
    * Creates a Virtual Node
    * @public
@@ -36,9 +36,11 @@
   function VNode(tagName, props, children) {
     this.tagName = tagName || 'div';
     this.children = children || [];
-    this.props = props || {};
-    _counter += 1;
-    this.props[DATA_NODE_ATTRIBUTE] = _counter;
+    this.props = props || {}; // increment counter
+
+    counter += 1; // assign counter to props
+
+    this.props[POWER_NODE_ATTRIBUTE] = counter;
     return this;
   }
 
@@ -146,6 +148,17 @@
    */
   var isHtml = function isHtml(obj) {
     return obj instanceof Element;
+  };
+
+  /**
+   * Determines if the passed children are keyed or not
+   * @private
+   * @param {Array} oldChildren
+   * @param {Array} newChildren
+   * @return {Boolean}
+   */
+  var isKeyedList = function isKeyedList(oldChildren, newChildren) {
+    return newChildren.length && newChildren[0].props && newChildren[0].props.key || oldChildren.length && oldChildren[0].props && oldChildren[0].props.key;
   };
 
   /**
@@ -354,7 +367,10 @@
   var decorateElement = function decorateElement(element, props) {
     for (var prop in props) {
       if (prop === 'style') {
-        updateElementStyles(element, props[prop]);
+        if (!isEqual(element.style, props.style)) {
+          updateElementStyles(element, props[prop]);
+        }
+
         continue;
       }
 
@@ -363,9 +379,10 @@
         continue;
       }
 
-      if (isElementAttribute(element, prop)) {
-        element.setAttribute(jsxProps[prop] || prop, props[prop]);
-        continue;
+      if (isElementAttribute(element, prop) || prop === 'key') {
+        if (!element[prop] || props[prop] !== element[prop]) {
+          element.setAttribute(jsxProps[prop] || prop, props[prop]);
+        }
       }
     }
   };
@@ -428,13 +445,16 @@
   var createElement = function createElement(vnode) {
     // create the element
     var element = document.createElement(vnode.tagName.name || vnode.tagName);
+    var fragment = document.createDocumentFragment();
+
+    if (vnode.children && vnode.children.length) {
+      appendChildren(fragment, vnode.children);
+    }
+
+    element.appendChild(fragment);
 
     if (vnode.props && Object.keys(vnode.props).length) {
       decorateElement(element, vnode.props);
-    }
-
-    if (vnode.children && vnode.children.length) {
-      appendChildren(element, vnode.children);
     }
 
     return element;
@@ -455,11 +475,6 @@
       return;
     }
 
-    if (!isEqual(oldObj.style, newObj.style)) {
-      // update styling
-      updateElementStyles(element, newObj.style, oldObj.style);
-    }
-
     for (var key in oldObj) {
       if (!newObj[key]) {
         // removing attribute from element
@@ -467,15 +482,7 @@
       }
     }
 
-    for (var _key in newObj) {
-      if (_key !== 'style' && !isEvent(_key)) {
-        // check if there a new key
-        if (!oldObj[_key] || newObj[_key] !== oldObj[_key]) {
-          // add attribute to element
-          element.setAttribute(jsxProps[_key] || _key, newObj[_key]);
-        }
-      }
-    }
+    decorateElement(element, newObj);
   };
 
   /**
@@ -540,9 +547,52 @@
     var childLength = oldChildren.length - 1;
 
     while (childLengthDiff > 0) {
-      removeNode(Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(oldChildren[childLength].props[DATA_NODE_ATTRIBUTE], "\"]")));
+      removeNode(Component.node.querySelector("[".concat(POWER_NODE_ATTRIBUTE, "=\"").concat(oldChildren[childLength].props[POWER_NODE_ATTRIBUTE], "\"]")));
       childLength -= 1;
       childLengthDiff -= 1;
+    }
+  };
+
+  /**
+   * diffing keyed lists
+   * @param {Array}       oldChilds
+   * @param {Array}       newChilds
+   * @param {DOM Element} parent
+   */
+
+  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, parent) {
+    // get every old key
+    var oldKeys = oldChilds.map(function (child) {
+      return child.props.key;
+    }); // get every new key
+
+    var newKeys = newChilds.map(function (child) {
+      return child.props.key;
+    });
+
+    if (oldKeys.length > newKeys.length) {
+      var differenceKeys = oldKeys.filter(function (key) {
+        return newKeys.indexOf(key) < 0;
+      });
+      differenceKeys.forEach(function (diff) {
+        var element = parent.querySelector("[key=\"".concat(diff, "\"]"));
+
+        if (parent) {
+          parent.removeChild(element);
+        }
+      });
+    } else if (oldKeys.length < newKeys.length) {
+      var _differenceKeys = newKeys.filter(function (key) {
+        return oldKeys.indexOf(key) < 0;
+      });
+
+      _differenceKeys.forEach(function (key) {
+        newChilds.forEach(function (child) {
+          if (child.props.key === key) {
+            parent.appendChild(createElement(child));
+          }
+        });
+      });
     }
   };
 
@@ -556,20 +606,26 @@
 
   var diff = function diff(oldVNode, newVNode, Component) {
     // get the element id
-    var powerId = oldVNode.props[DATA_NODE_ATTRIBUTE]; // check if newVNode props is null
+    var powerId = oldVNode.props[POWER_NODE_ATTRIBUTE]; // check if newVNode props is null
 
     if (newVNode.props === null) {
       newVNode.props = {};
     } // merge the node id
 
 
-    newVNode.props[DATA_NODE_ATTRIBUTE] = oldVNode.props[DATA_NODE_ATTRIBUTE]; // get the dom element to the vnode
+    newVNode.props[POWER_NODE_ATTRIBUTE] = powerId; // get the dom element to the vnode
 
-    var element = Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]")); // compare props
+    var element = Component.node.querySelector("[".concat(POWER_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]"));
+    var newChildren = newVNode.children;
+    var oldChildren = oldVNode.children; // compare props
 
     propsDiff(oldVNode.props, newVNode.props, element); // compare children
 
-    childrenDiff(oldVNode.children, newVNode.children, element, Component);
+    if (isKeyedList(oldChildren, newChildren)) {
+      keyChildrenDiff(oldChildren, newChildren, element);
+    } else {
+      childrenDiff(oldChildren, newChildren, element, Component);
+    }
   };
 
   var ARRAY_MODIFIERS = ['push', 'pop', 'shift', 'unshift', 'splice'];
@@ -690,7 +746,7 @@
       value: function create() {
         // creating the component root element
         this.node = document.createElement(this.name);
-        this.node.setAttribute(DATA_COMPONENT_ATTRIBUTE, true); // get the vnode construct
+        this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true); // get the vnode construct
 
         this.componentVDom = this.render(); // convert props into proxy object
 
