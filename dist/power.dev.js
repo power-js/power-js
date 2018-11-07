@@ -45,7 +45,7 @@
   }
 
   /**
-   * stack // TODO better description
+   * Array used to sanitize child nodes
    * @type {Array}
    */
 
@@ -68,7 +68,7 @@
     while (stack.length) {
       var child = stack.pop();
 
-      if (child.pop) {
+      if (child && child.pop) {
         for (var _i = child.length; _i--;) {
           stack[stack.length] = child[_i];
         }
@@ -82,7 +82,7 @@
         }
 
         if (typeof child !== 'function') {
-          if (child === null) {
+          if (child === null || child === undefined) {
             child = '';
           }
         }
@@ -95,27 +95,14 @@
   }
 
   /**
-   * Determines whether a string begins with the characters of a specified string, returning true or false.
-   * @private
-   * @param  {String} text     The text string that will be searched
-   * @param  {String} search   The characters to be searched for at the start of this string
-   * @param  {Number} position The position in the text to begin searching - defaults to 0 (optional)
-   * @return {Boolean}         True if the given characters are found at the beginning of the string; otherwise, false
-   */
-  var startsWith = function startsWith(text, search, position) {
-    return text.substr(!position || position < 0 ? 0 : +position, search.length) === search;
-  };
-
-  /**
    * Determines whether the passed object is a valid element attribute
    * @private
    * @param {HTMLElement} element DOM Element to check the property against
    * @param {String} attribute String containing the property name to lookup
    * @return {Boolean} Returns true if the passed attribute exists inside the element
    */
-
   var isElementAttribute = function isElementAttribute(element, attribute) {
-    return attribute in element || attribute === 'class' || startsWith(attribute, 'data-') || startsWith(attribute, 'power-');
+    return attribute in element || attribute === 'class' || attribute.startsWith('data-') || attribute.startsWith('power-');
   };
 
   /**
@@ -135,9 +122,8 @@
    * @param {String} event String containing the event
    * @return {Boolean} Returns true if the passed string is an event, else false
    */
-
   var isEvent = function isEvent(event) {
-    return (startsWith(event, 'on') ? event.toLowerCase() : "on".concat(event)) in window;
+    return (event.startsWith('on') ? event.toLowerCase() : "on".concat(event)) in window;
   };
 
   /**
@@ -301,6 +287,14 @@
   };
 
   /**
+   * Helpers proxy to handle binding/unbinding listeners
+   * @param  {Object} e Event object
+   * @return {Function} Event listener function
+   */
+  var proxyFn = function proxyFn(e) {
+    return this.$events[e.type](e);
+  };
+  /**
    * Assigns a callback function to the event type on the specificed element that
    * will be called whenever the event is triggered
    * @private
@@ -308,12 +302,17 @@
    * @param {Event}       event
    * @param {Function}    handler
    */
+
   var addEventListener = function addEventListener(element, event, handler) {
     var eventType = event.startsWith('on') ? event.substring(2, event.length).toLowerCase() : event; // invoke the callback function in the context of the DOM element
 
-    element.addEventListener(eventType, function (e) {
-      return handler.call(element, e, element);
-    });
+    element.addEventListener(eventType, proxyFn);
+
+    if (!element.$events) {
+      element.$events = {};
+    }
+
+    element.$events[eventType] = handler;
   };
 
   /**
@@ -361,27 +360,37 @@
    * events to the specified element
    * @private
    * @param {HTMLElement} element
-   * @param {Object}      elementProps
+   * @param {Object}      nextProps
+   * @param {object}      prevProps
    */
 
-  var decorateElement = function decorateElement(element, props) {
-    for (var prop in props) {
-      if (prop === 'style') {
-        if (!isEqual(element.style, props.style)) {
-          updateElementStyles(element, props[prop]);
+  var decorateElement = function decorateElement(element, nextProps, prevProps) {
+    if (prevProps) {
+      for (var prop in prevProps) {
+        if (!nextProps[prop]) {
+          if (isEvent(prop) && element.$events[prop]) {
+            element.removeEventListener(prop, element.$events[prop]);
+          } else {
+            element.removeAttribute(jsxProps[prop] || prop);
+          }
         }
+      }
+    }
 
+    for (var _prop in nextProps) {
+      if (_prop === 'style' && !isEqual(element.style, nextProps.style)) {
+        updateElementStyles(element, nextProps[_prop]);
         continue;
       }
 
-      if (isEvent(prop)) {
-        addEventListener(element, prop, props[prop]);
+      if (isEvent(_prop)) {
+        addEventListener(element, _prop, nextProps[_prop]);
         continue;
       }
 
-      if (isElementAttribute(element, prop) || prop === 'key') {
-        if (!element[prop] || props[prop] !== element[prop]) {
-          element.setAttribute(jsxProps[prop] || prop, props[prop]);
+      if (isElementAttribute(element, _prop) || _prop === 'key') {
+        if (!element[_prop] || nextProps[_prop] !== element[_prop]) {
+          element.setAttribute(jsxProps[_prop] || _prop, nextProps[_prop]);
         }
       }
     }
@@ -464,25 +473,18 @@
    * checks out the difference between 2 objects
    * and merges it into the component element
    * @private
-   * @param {Object}      oldObj
-   * @param {Object}      newObj
+   * @param {Object}      prevProps
+   * @param {Object}      nextProps
    * @param {HTMLElement} element
    */
 
-  var propsDiff = function propsDiff(oldObj, newObj, element) {
+  var propsDiff = function propsDiff(prevProps, nextProps, element) {
     // prevent unneeded iterations
-    if (isEqual(oldObj, newObj)) {
+    if (isEqual(prevProps, nextProps)) {
       return;
     }
 
-    for (var key in oldObj) {
-      if (!newObj[key]) {
-        // removing attribute from element
-        element.removeAttribute(jsxProps[key] || key);
-      }
-    }
-
-    decorateElement(element, newObj);
+    decorateElement(element, nextProps, prevProps);
   };
 
   /**
@@ -495,13 +497,6 @@
       child.parentNode.removeChild(child);
     }
   };
-
-  /**
-   * Replaces one child node of the specified node with another
-   * @private
-   * @param {HTMLElement} oldChild
-   * @param {HTMLElement} newChild
-   */
 
   /**
    * checks out the difference between 2 Arrays

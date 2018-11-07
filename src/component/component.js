@@ -1,4 +1,4 @@
-import { extend } from '../utils/objects';
+import { extend } from '../utils/objects/extend';
 import { isEqual, isFunction, isObject } from '../utils/is';
 import { POWER_COMPONENT_ATTRIBUTE } from '../constants';
 import { createElement } from '../dom/createElement';

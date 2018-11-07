@@ -1,5 +1,3 @@
-import { startsWith } from '../strings';
-
 /**
  * Determines whether the passed object is a valid element attribute
  * @private
@@ -7,4 +5,4 @@ import { startsWith } from '../strings';
  * @param {String} attribute String containing the property name to lookup
  * @return {Boolean} Returns true if the passed attribute exists inside the element
  */
-export const isElementAttribute = (element, attribute) => attribute in element || attribute === 'class' || startsWith(attribute, 'data-') || startsWith(attribute, 'power-');
+export const isElementAttribute = (element, attribute) => attribute in element || attribute === 'class' || attribute.startsWith('data-') || attribute.startsWith('power-');

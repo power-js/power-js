@@ -1,6 +1,6 @@
 import { isString, isVNode } from '../utils/is';
 import { createElement } from '../dom/createElement';
-import { removeNode } from '../utils/dom';
+import { removeNode } from '../utils/dom/removeNode';
 import { POWER_NODE_ATTRIBUTE } from '../constants';
 import { diff } from './diff';
 
