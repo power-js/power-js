@@ -1,7 +1,7 @@
 import { isString, isVNode } from '../utils/is';
 import { createElement } from '../dom/createElement';
 import { removeNode } from '../utils/dom';
-import { DATA_NODE_ATTRIBUTE } from '../constants';
+import { POWER_NODE_ATTRIBUTE } from '../constants';
 import { diff } from './diff';
 
 /**
@@ -51,7 +51,7 @@ export const childrenDiff = (oldChildren, newChildren, element, Component) => {
   let childLength = oldChildren.length - 1;
 
   while (childLengthDiff > 0) {
-    removeNode(Component.node.querySelector(`[${DATA_NODE_ATTRIBUTE}="${oldChildren[childLength].props[DATA_NODE_ATTRIBUTE]}"]`));
+    removeNode(Component.node.querySelector(`[${POWER_NODE_ATTRIBUTE}="${oldChildren[childLength].props[POWER_NODE_ATTRIBUTE]}"]`));
     childLength -= 1;
     childLengthDiff -= 1;
   }
