@@ -1,10 +1,10 @@
-import { DATA_NODE_ATTRIBUTE } from '../constants';
+import { POWER_NODE_ATTRIBUTE } from '../constants';
 
 /**
  * VNode Counter
  * @type {Number}
  */
-let _counter = 0;
+let counter = 0;
 
 /**
  * Creates a Virtual Node
@@ -20,10 +20,10 @@ export function VNode(tagName, props, children) {
   this.props = props || {};
 
   // increment counter
-  _counter += 1;
+  counter += 1;
 
-  // assign _counter to props
-  this.props[DATA_NODE_ATTRIBUTE] = _counter;
+  // assign counter to props
+  this.props[POWER_NODE_ATTRIBUTE] = counter;
 
   return this;
 }

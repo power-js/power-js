@@ -6,7 +6,7 @@ import { createElement } from '../dom/createElement';
  * @param {Array}       newChilds
  * @param {DOM Element} parent
  */
-export const keyChildrenDiff = (oldChilds, newChilds, parent, Component) => {
+export const keyChildrenDiff = (oldChilds, newChilds, parent) => {
   // get every old key
   const oldKeys = oldChilds.map((child) => child.props.key);
   // get every new key
@@ -18,8 +18,8 @@ export const keyChildrenDiff = (oldChilds, newChilds, parent, Component) => {
     differenceKeys.forEach((diff) => {
       const element = parent.querySelector(`[key="${diff}"]`);
 
-      if(element.parentNode){
-        element.parentNode.removeChild(element);
+      if(parent){
+        parent.removeChild(element);
       }
     });
   } else if (oldKeys.length < newKeys.length) {

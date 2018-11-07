@@ -9,21 +9,21 @@
    * @private
    * @type {String}
    */
-  var DATA_COMPONENT_ATTRIBUTE = 'power-component';
+  var POWER_COMPONENT_ATTRIBUTE = 'power-component';
   /**
    * data node id
    * @private
    * @type {String}
    */
 
-  var DATA_NODE_ATTRIBUTE = 'power-id';
+  var POWER_NODE_ATTRIBUTE = 'power-id';
 
   /**
    * VNode Counter
    * @type {Number}
    */
 
-  var _counter = 0;
+  var counter = 0;
   /**
    * Creates a Virtual Node
    * @public
@@ -38,9 +38,9 @@
     this.children = children || [];
     this.props = props || {}; // increment counter
 
-    _counter += 1; // assign _counter to props
+    counter += 1; // assign counter to props
 
-    this.props[DATA_NODE_ATTRIBUTE] = _counter;
+    this.props[POWER_NODE_ATTRIBUTE] = counter;
     return this;
   }
 
@@ -367,7 +367,10 @@
   var decorateElement = function decorateElement(element, props) {
     for (var prop in props) {
       if (prop === 'style') {
-        updateElementStyles(element, props[prop]);
+        if (!isEqual(element.style, props.style)) {
+          updateElementStyles(element, props[prop]);
+        }
+
         continue;
       }
 
@@ -377,8 +380,9 @@
       }
 
       if (isElementAttribute(element, prop) || prop === 'key') {
-        element.setAttribute(jsxProps[prop] || prop, props[prop]);
-        continue;
+        if (!element[prop] || props[prop] !== element[prop]) {
+          element.setAttribute(jsxProps[prop] || prop, props[prop]);
+        }
       }
     }
   };
@@ -471,11 +475,6 @@
       return;
     }
 
-    if (!isEqual(oldObj.style, newObj.style)) {
-      // update styling
-      updateElementStyles(element, newObj.style, oldObj.style);
-    }
-
     for (var key in oldObj) {
       if (!newObj[key]) {
         // removing attribute from element
@@ -483,15 +482,7 @@
       }
     }
 
-    for (var _key in newObj) {
-      if (_key !== 'style' && !isEvent(_key)) {
-        // check if there a new key
-        if (!oldObj[_key] || newObj[_key] !== oldObj[_key]) {
-          // add attribute to element
-          element.setAttribute(jsxProps[_key] || _key, newObj[_key]);
-        }
-      }
-    }
+    decorateElement(element, newObj);
   };
 
   /**
@@ -556,7 +547,7 @@
     var childLength = oldChildren.length - 1;
 
     while (childLengthDiff > 0) {
-      removeNode(Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(oldChildren[childLength].props[DATA_NODE_ATTRIBUTE], "\"]")));
+      removeNode(Component.node.querySelector("[".concat(POWER_NODE_ATTRIBUTE, "=\"").concat(oldChildren[childLength].props[POWER_NODE_ATTRIBUTE], "\"]")));
       childLength -= 1;
       childLengthDiff -= 1;
     }
@@ -569,7 +560,7 @@
    * @param {DOM Element} parent
    */
 
-  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, parent, Component) {
+  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, parent) {
     // get every old key
     var oldKeys = oldChilds.map(function (child) {
       return child.props.key;
@@ -586,8 +577,8 @@
       differenceKeys.forEach(function (diff) {
         var element = parent.querySelector("[key=\"".concat(diff, "\"]"));
 
-        if (element.parentNode) {
-          element.parentNode.removeChild(element);
+        if (parent) {
+          parent.removeChild(element);
         }
       });
     } else if (oldKeys.length < newKeys.length) {
@@ -615,23 +606,23 @@
 
   var diff = function diff(oldVNode, newVNode, Component) {
     // get the element id
-    var powerId = oldVNode.props[DATA_NODE_ATTRIBUTE]; // check if newVNode props is null
+    var powerId = oldVNode.props[POWER_NODE_ATTRIBUTE]; // check if newVNode props is null
 
     if (newVNode.props === null) {
       newVNode.props = {};
     } // merge the node id
 
 
-    newVNode.props[DATA_NODE_ATTRIBUTE] = oldVNode.props[DATA_NODE_ATTRIBUTE]; // get the dom element to the vnode
+    newVNode.props[POWER_NODE_ATTRIBUTE] = powerId; // get the dom element to the vnode
 
-    var element = Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]"));
+    var element = Component.node.querySelector("[".concat(POWER_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]"));
     var newChildren = newVNode.children;
     var oldChildren = oldVNode.children; // compare props
 
     propsDiff(oldVNode.props, newVNode.props, element); // compare children
 
     if (isKeyedList(oldChildren, newChildren)) {
-      keyChildrenDiff(oldChildren, newChildren, element, Component);
+      keyChildrenDiff(oldChildren, newChildren, element);
     } else {
       childrenDiff(oldChildren, newChildren, element, Component);
     }
@@ -755,7 +746,7 @@
       value: function create() {
         // creating the component root element
         this.node = document.createElement(this.name);
-        this.node.setAttribute(DATA_COMPONENT_ATTRIBUTE, true); // get the vnode construct
+        this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true); // get the vnode construct
 
         this.componentVDom = this.render(); // convert props into proxy object
 

@@ -1,5 +1,5 @@
-import { isEvent, isEqual } from '../utils/is';
-import { updateElementStyles } from '../dom/updateElementStyles';
+import { isEqual } from '../utils/is';
+import { decorateElement } from '../dom/decorateElement';
 import { jsxProps } from '../vdom/jsxProps';
 
 /**
@@ -16,11 +16,6 @@ export const propsDiff = (oldObj, newObj, element) => {
     return;
   }
 
-  if (!isEqual(oldObj.style, newObj.style)) {
-    // update styling
-    updateElementStyles(element, newObj.style, oldObj.style);
-  }
-
   for (const key in oldObj) {
     if (!newObj[key]) {
       // removing attribute from element
@@ -28,13 +23,5 @@ export const propsDiff = (oldObj, newObj, element) => {
     }
   }
 
-  for (const key in newObj) {
-    if (key !== 'style' && !isEvent(key)) {
-      // check if there a new key
-      if (!oldObj[key] || newObj[key] !== oldObj[key]) {
-        // add attribute to element
-        element.setAttribute(jsxProps[key] || key, newObj[key]);
-      }
-    }
-  }
+  decorateElement(element, newObj);
 };

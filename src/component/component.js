@@ -1,6 +1,6 @@
 import { extend } from '../utils/objects';
 import { isEqual, isFunction, isObject } from '../utils/is';
-import { DATA_COMPONENT_ATTRIBUTE } from '../constants';
+import { POWER_COMPONENT_ATTRIBUTE } from '../constants';
 import { createElement } from '../dom/createElement';
 import { diff } from '../diff/diff';
 import { proxy } from './proxy';
@@ -56,7 +56,7 @@ export class Component {
     // creating the component root element
     this.node = document.createElement(this.name);
 
-    this.node.setAttribute(DATA_COMPONENT_ATTRIBUTE, true);
+    this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true);
 
     // get the vnode construct
     this.componentVDom = this.render();
