@@ -151,6 +151,17 @@
   };
 
   /**
+   * Determines if the passed children are keyed or not
+   * @private
+   * @param {Array} oldChildren
+   * @param {Array} newChildren
+   * @return {Boolean}
+   */
+  var isKeyedList = function isKeyedList(oldChildren, newChildren) {
+    return newChildren.length && newChildren[0].props && newChildren[0].props.key || oldChildren.length && oldChildren[0].props && oldChildren[0].props.key;
+  };
+
+  /**
    * Determines wheter the passed object is a vnode
    * @private
    * @param {Object} vnode
@@ -572,21 +583,13 @@
       var differenceKeys = oldKeys.filter(function (key) {
         return newKeys.indexOf(key) < 0;
       });
+      differenceKeys.forEach(function (diff) {
+        var element = parent.querySelector("[key=\"".concat(diff, "\"]"));
 
-      if (differenceKeys.length === 1) {
-        var element = parent.querySelector("[key=\"".concat(differenceKeys[0], "\"]"));
-        parent.removeChild(element);
-      } else {
-        var keys = '';
-
-        for (var i = 0, k = differenceKeys.length; i < k; i++) {
-          keys += "[key=\"".concat(differenceKeys[i], "\"],");
+        if (element.parentNode) {
+          element.parentNode.removeChild(element);
         }
-
-        parent.querySelectorAll(keys.slice(0, keys.length - 1)).forEach(function (child) {
-          return child.parentNode.removeChild(child);
-        });
-      }
+      });
     } else if (oldKeys.length < newKeys.length) {
       var _differenceKeys = newKeys.filter(function (key) {
         return oldKeys.indexOf(key) < 0;
@@ -621,14 +624,16 @@
 
     newVNode.props[DATA_NODE_ATTRIBUTE] = oldVNode.props[DATA_NODE_ATTRIBUTE]; // get the dom element to the vnode
 
-    var element = Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]")); // compare props
+    var element = Component.node.querySelector("[".concat(DATA_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]"));
+    var newChildren = newVNode.children;
+    var oldChildren = oldVNode.children; // compare props
 
     propsDiff(oldVNode.props, newVNode.props, element); // compare children
 
-    if (newVNode.children.length && newVNode.children[0].props && newVNode.children[0].props.key) {
-      keyChildrenDiff(oldVNode.children, newVNode.children, element, Component);
+    if (isKeyedList(oldChildren, newChildren)) {
+      keyChildrenDiff(oldChildren, newChildren, element, Component);
     } else {
-      childrenDiff(oldVNode.children, newVNode.children, element, Component);
+      childrenDiff(oldChildren, newChildren, element, Component);
     }
   };
 
