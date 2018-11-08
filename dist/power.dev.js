@@ -548,46 +548,74 @@
     }
   };
 
+  var diffChildrenKeys = function diffChildrenKeys(first, second) {
+    var a = [];
+    var diff = [];
+
+    for (var i = 0, k = first.length; i < k; i++) {
+      a[first[i]] = true;
+    }
+
+    for (var _i = 0, _k = second.length; _i < _k; _i++) {
+      if (a[second[_i]]) {
+        delete a[second[_i]];
+      } else {
+        a[second[_i]] = true;
+      }
+    }
+
+    for (var _k2 in a) {
+      diff[diff.length] = _k2;
+    }
+
+    return diff;
+  };
   /**
    * diffing keyed lists
-   * @param {Array}       oldChilds
-   * @param {Array}       newChilds
-   * @param {DOM Element} parent
+   * @param {Array}       oldChildren
+   * @param {Array}       newChildren
+   * @param {DOM Element} parentNode
    */
 
-  var keyChildrenDiff = function keyChildrenDiff(oldChilds, newChilds, parent) {
+
+  var keyChildrenDiff = function keyChildrenDiff(oldChildren, newChildren, parentNode) {
     // get every old key
-    var oldKeys = oldChilds.map(function (child) {
+    var oldKeys = oldChildren.map(function (child) {
       return child.props.key;
     }); // get every new key
 
-    var newKeys = newChilds.map(function (child) {
+    var newKeys = newChildren.map(function (child) {
       return child.props.key;
-    });
+    }); // get the diff on keys
+
+    var diffedKeys = diffChildrenKeys(oldKeys, newKeys);
 
     if (oldKeys.length > newKeys.length) {
-      var differenceKeys = oldKeys.filter(function (key) {
-        return newKeys.indexOf(key) < 0;
-      });
-      differenceKeys.forEach(function (diff) {
-        var element = parent.querySelector("[key=\"".concat(diff, "\"]"));
+      for (var i = 0, k = diffedKeys.length; i < k; i++) {
+        var key = diffedKeys[i];
 
-        if (parent) {
-          parent.removeChild(element);
-        }
-      });
-    } else if (oldKeys.length < newKeys.length) {
-      var _differenceKeys = newKeys.filter(function (key) {
-        return oldKeys.indexOf(key) < 0;
-      });
+        for (var a = 0, b = parentNode.children.length; a < b; a++) {
+          var node = parentNode.children[a];
 
-      _differenceKeys.forEach(function (key) {
-        newChilds.forEach(function (child) {
-          if (child.props.key === key) {
-            parent.appendChild(createElement(child));
+          if (node && node.attributes.key.value === key) {
+            parentNode.removeChild(node);
+            break;
           }
-        });
-      });
+        }
+      }
+    } else if (oldKeys.length < newKeys.length) {
+      for (var _i2 = 0, _k3 = diffedKeys.length; _i2 < _k3; _i2++) {
+        var _key = diffedKeys[_i2];
+
+        for (var a = newChildren.length - 1; a >= 0; a--) {
+          var _node = newChildren[a];
+
+          if (String(_node.props.key) === _key) {
+            parentNode.appendChild(createElement(_node));
+            break;
+          }
+        }
+      }
     }
   };
 
@@ -612,15 +640,16 @@
 
     var element = Component.node.querySelector("[".concat(POWER_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]"));
     var newChildren = newVNode.children;
-    var oldChildren = oldVNode.children; // compare props
-
-    propsDiff(oldVNode.props, newVNode.props, element); // compare children
+    var oldChildren = oldVNode.children; // compare children
 
     if (isKeyedList(oldChildren, newChildren)) {
       keyChildrenDiff(oldChildren, newChildren, element);
     } else {
       childrenDiff(oldChildren, newChildren, element, Component);
-    }
+    } // compare props
+
+
+    propsDiff(oldVNode.props, newVNode.props, element);
   };
 
   var ARRAY_MODIFIERS = ['push', 'pop', 'shift', 'unshift', 'splice'];
@@ -714,16 +743,16 @@
 
       this._power = true; // the component gets the name of the class name
 
-      this.name = construct.name; // intial state
-
-      this.state = isFunction(this.getInitialState) ? this.getInitialState() : isObject(construct.initialState) ? construct.initialState : {}; // default props
+      this.name = construct.name; // default props
 
       this.props = isFunction(this.getDefaultProps) ? this.getDefaultProps() : isObject(construct.defaultProps) ? construct.defaultProps : {}; // merge defaultProps with inline props
 
       if (props) {
         this.props = extend({}, this.props, props);
-      } // Getting called after constructor
+      } // intial state
 
+
+      this.state = isFunction(this.getInitialState) ? this.getInitialState() : isObject(construct.initialState) ? construct.initialState : {}; // Getting called after constructor
 
       if (this.componentDidInitialize) {
         this.componentDidInitialize(this);
@@ -741,14 +770,13 @@
       value: function create() {
         // creating the component root element
         this.node = document.createElement(this.name);
-        this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true); // get the vnode construct
+        this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true); // convert props into proxy object
 
-        this.componentVDom = this.render(); // convert props into proxy object
+        this.props = proxy(this, this.props); // get the vnode construct
 
-        this.props = proxy(this, this.props); // get the template by call the render
+        this.componentVDom = this.render(); // get the template by call the render
 
-        this.template = createElement(this.componentVDom, this);
-        this.node.appendChild(this.template);
+        this.node.appendChild(createElement(this.componentVDom, this));
         return this.node;
       }
     }, {
@@ -767,22 +795,25 @@
     }, {
       key: "setState",
       value: function setState(state, updateCallback) {
-        // prevent update when receiving same state
-        if (isEqual(state, this.state)) {
+        // keep a ref to prevState
+        var prevState = this.state; // prevent update when receiving same state
+
+        if (isEqual(state, prevState)) {
           return;
         }
 
+        var props = this.props;
         var newState = state; // if newState is a function
 
         if (isFunction(newState)) {
           // pass current currentState
-          newState = newState.call(this, this.state, this.props);
+          newState = newState.call(this, prevState, props);
         } // merge the new state with the existing
 
 
-        newState = extend({}, this.state, newState); // if false, drop any state changes
+        newState = extend({}, prevState, newState); // if false, drop any state changes
 
-        if (!this.shouldComponentUpdate(this.props, newState)) {
+        if (!this.shouldComponentUpdate(props, newState)) {
           return false;
         } // apply state changes
 
@@ -852,7 +883,8 @@
           this.componentWillUnmount(this);
         }
 
-        this.node.parentElement.removeChild(this.node);
+        this.node.parentNode.removeChild(this.node);
+        this.node = null;
 
         if (this.componentDidUnmount) {
           this.componentDidUnmount(this);

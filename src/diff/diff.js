@@ -27,8 +27,6 @@ export const diff = (oldVNode, newVNode, Component) => {
   const element = Component.node.querySelector(`[${POWER_NODE_ATTRIBUTE}="${powerId}"]`);
   const newChildren = newVNode.children;
   const oldChildren = oldVNode.children;
-  // compare props
-  propsDiff(oldVNode.props, newVNode.props, element);
 
   // compare children
   if (isKeyedList(oldChildren, newChildren)) {
@@ -36,4 +34,7 @@ export const diff = (oldVNode, newVNode, Component) => {
   } else {
     childrenDiff(oldChildren, newChildren, element, Component);
   }
+
+  // compare props
+  propsDiff(oldVNode.props, newVNode.props, element);
 };

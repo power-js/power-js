@@ -1,36 +1,66 @@
 import { createElement } from '../dom/createElement';
 
+const diffChildrenKeys = function(first, second){
+  const a = [];
+  const diff = [];
+
+  for (let i = 0, k = first.length; i < k; i++) {
+    a[first[i]] = true;
+  }
+
+  for (let i = 0, k = second.length; i < k; i++) {
+    if (a[second[i]]) {
+      delete a[second[i]];
+    } else {
+      a[second[i]] = true;
+    }
+  }
+
+  for (const k in a) {
+    diff[diff.length] = k
+  }
+
+  return diff;
+}
 /**
  * diffing keyed lists
- * @param {Array}       oldChilds
- * @param {Array}       newChilds
- * @param {DOM Element} parent
+ * @param {Array}       oldChildren
+ * @param {Array}       newChildren
+ * @param {DOM Element} parentNode
  */
-export const keyChildrenDiff = (oldChilds, newChilds, parent) => {
+export const keyChildrenDiff = (oldChildren, newChildren, parentNode) => {
   // get every old key
-  const oldKeys = oldChilds.map((child) => child.props.key);
+  const oldKeys = oldChildren.map((child) => child.props.key);
   // get every new key
-  const newKeys = newChilds.map((child) => child.props.key);
+  const newKeys = newChildren.map((child) => child.props.key);
+  // get the diff on keys
+  const diffedKeys = diffChildrenKeys(oldKeys, newKeys);
 
   if (oldKeys.length > newKeys.length) {
-    const differenceKeys = oldKeys.filter((key) => newKeys.indexOf(key) < 0);
+    for (let i = 0, k = diffedKeys.length; i < k; i++) {
+      const key = diffedKeys[i];
 
-    differenceKeys.forEach((diff) => {
-      const element = parent.querySelector(`[key="${diff}"]`);
+      for(var a = 0, b = parentNode.children.length; a < b; a++){
+        const node = parentNode.children[a];
 
-      if(parent){
-        parent.removeChild(element);
-      }
-    });
-  } else if (oldKeys.length < newKeys.length) {
-    const differenceKeys = newKeys.filter((key) => oldKeys.indexOf(key) < 0);
-
-    differenceKeys.forEach((key) => {
-      newChilds.forEach((child) => {
-        if (child.props.key === key) {
-          parent.appendChild(createElement(child));
+        if(node && node.attributes.key.value === key){
+          parentNode.removeChild(node);
+          break;
         }
-      });
-    });
+      }
+    }
+  } else if (oldKeys.length < newKeys.length) {
+    for (let i = 0, k = diffedKeys.length; i < k; i++) {
+      const key = diffedKeys[i];
+
+      for (var a = newChildren.length - 1; a >= 0; a--){
+        const node = newChildren[a];
+
+        if (String(node.props.key) === key) {
+          parentNode.appendChild(createElement(node));
+          break;
+        }
+      }
+    }
   }
 };

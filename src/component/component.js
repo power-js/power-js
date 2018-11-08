@@ -30,9 +30,6 @@ export class Component {
     // the component gets the name of the class name
     this.name = construct.name;
 
-    // intial state
-    this.state = isFunction(this.getInitialState) ? this.getInitialState() : isObject(construct.initialState) ? construct.initialState : {};
-
     // default props
     this.props = isFunction(this.getDefaultProps) ? this.getDefaultProps() : isObject(construct.defaultProps) ? construct.defaultProps : {};
 
@@ -40,6 +37,9 @@ export class Component {
     if (props) {
       this.props = extend({}, this.props, props);
     }
+
+    // intial state
+    this.state = isFunction(this.getInitialState) ? this.getInitialState() : isObject(construct.initialState) ? construct.initialState : {};
 
     // Getting called after constructor
     if (this.componentDidInitialize) {
@@ -58,16 +58,14 @@ export class Component {
 
     this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true);
 
-    // get the vnode construct
-    this.componentVDom = this.render();
-
     // convert props into proxy object
     this.props = proxy(this, this.props);
 
-    // get the template by call the render
-    this.template = createElement(this.componentVDom, this);
+    // get the vnode construct
+    this.componentVDom = this.render();
 
-    this.node.appendChild(this.template);
+    // get the template by call the render
+    this.node.appendChild(createElement(this.componentVDom, this));
 
     return this.node;
   }
@@ -84,23 +82,28 @@ export class Component {
    * @param {Function} updateCallback The callback function to invoke after state has been updated
    */
   setState(state, updateCallback) {
+    // keep a ref to prevState
+    const prevState = this.state;
+
     // prevent update when receiving same state
-    if (isEqual(state, this.state)) {
+    if (isEqual(state, prevState)) {
       return;
     }
+
+    const props = this.props;
 
     let newState = state;
     // if newState is a function
     if (isFunction(newState)) {
       // pass current currentState
-      newState = newState.call(this, this.state, this.props);
+      newState = newState.call(this, prevState, props);
     }
 
     // merge the new state with the existing
-    newState = extend({}, this.state, newState);
+    newState = extend({}, prevState, newState);
 
     // if false, drop any state changes
-    if (!this.shouldComponentUpdate(this.props, newState)) {
+    if (!this.shouldComponentUpdate(props, newState)) {
       return false;
     }
 
@@ -165,7 +168,9 @@ export class Component {
       this.componentWillUnmount(this);
     }
 
-    this.node.parentElement.removeChild(this.node);
+    this.node.parentNode.removeChild(this.node);
+
+    this.node = null;
 
     if (this.componentDidUnmount) {
       this.componentDidUnmount(this);
