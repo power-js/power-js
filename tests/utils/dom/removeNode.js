@@ -1,4 +1,4 @@
-import { removeNode } from '../../../src/utils/dom';
+import { removeNode } from '../../../src/utils/dom/removeNode';
 
 describe('utils/dom', () => {
   describe('#removeNode', () => {

@@ -1,4 +1,4 @@
-import { replaceNode } from '../../../src/utils/dom';
+import { replaceNode } from '../../../src/utils/dom/replaceNode';
 
 describe('utils/dom', () => {
   describe('#replaceNode', () => {

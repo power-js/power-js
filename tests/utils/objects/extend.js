@@ -1,4 +1,4 @@
-import { extend } from '../../../src/utils/objects';
+import { extend } from '../../../src/utils/objects/extend';
 
 describe('utils/objects', () => {
   describe('#extend', () => {

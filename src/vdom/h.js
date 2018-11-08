@@ -1,7 +1,7 @@
 import { VNode } from './vnode';
 
 /**
- * stack // TODO better description
+ * Array used to sanitize child nodes
  * @type {Array}
  */
 const stack = [];
@@ -23,7 +23,7 @@ export function h(tagName, props) {
   while (stack.length) {
     let child = stack.pop();
 
-    if (child.pop) {
+    if (child && child.pop) {
       for (let i = child.length; i--; ) {
         stack[stack.length] = child[i];
       }
@@ -37,7 +37,7 @@ export function h(tagName, props) {
       }
 
       if (typeof child !== 'function') {
-        if (child === null) {
+        if (child === null || child === undefined) {
           child = '';
         }
       }

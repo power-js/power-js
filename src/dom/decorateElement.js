@@ -8,26 +8,36 @@ import { jsxProps } from '../vdom/jsxProps';
  * events to the specified element
  * @private
  * @param {HTMLElement} element
- * @param {Object}      elementProps
+ * @param {Object}      nextProps
+ * @param {object}      prevProps
  */
-export const decorateElement = (element, props) => {
-  for (const prop in props) {
-    if (prop === 'style') {
-      if (!isEqual(element.style, props.style)) {
-        updateElementStyles(element, props[prop]);
+export const decorateElement = (element, nextProps, prevProps) => {
+  if (prevProps) {
+    for (const prop in prevProps) {
+      if (!nextProps[prop]) {
+        if (isEvent(prop) && element.$events[prop]) {
+          element.removeEventListener(prop, element.$events[prop]);
+        } else {
+          element.removeAttribute(jsxProps[prop] || prop);
+        }
       }
+    }
+  }
 
+  for (const prop in nextProps) {
+    if (prop === 'style' && !isEqual(element.style, nextProps.style)) {
+      updateElementStyles(element, nextProps[prop]);
       continue;
     }
 
     if (isEvent(prop)) {
-      addEventListener(element, prop, props[prop]);
+      addEventListener(element, prop, nextProps[prop]);
       continue;
     }
 
     if (isElementAttribute(element, prop) || prop === 'key') {
-      if (!element[prop] || props[prop] !== element[prop]) {
-        element.setAttribute(jsxProps[prop] || prop, props[prop]);
+      if (!element[prop] || nextProps[prop] !== element[prop]) {
+        element.setAttribute(jsxProps[prop] || prop, nextProps[prop]);
       }
     }
   }
