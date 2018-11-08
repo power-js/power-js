@@ -40,6 +40,7 @@ We aren't sure what this library will evolve into but we wanted to start with "g
 
 - <a href="https://github.com/power-js/power-js/blob/master/CHANGELOG.md">Change log</a>
 - <a href="https://github.com/power-js/todo-app">A simple Todo app</a>
+- <a href="https://power-js.github.io/todo-app">Live Demo</a>
 
 ## Before you start
 If you would like to use JSX with PowerJS you'll need to install this [Babel Plugin](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx) which will convert the JSX into a Virtual DOM. There's an example of this plugin config in the Todo app [here](https://github.com/power-js/todo-app/blob/master/.babelrc).
