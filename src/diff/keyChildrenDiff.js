@@ -1,23 +1,23 @@
 import { createElement } from '../dom/createElement';
 
 const diffChildrenKeys = function(first, second){
-  const a = [];
+  const keys = [];
   const diff = [];
 
   for (let i = 0, k = first.length; i < k; i++) {
-    a[first[i]] = true;
+    keys[first[i]] = true;
   }
 
   for (let i = 0, k = second.length; i < k; i++) {
-    if (a[second[i]]) {
-      delete a[second[i]];
+    if (keys[second[i]]) {
+      delete keys[second[i]];
     } else {
-      a[second[i]] = true;
+      keys[second[i]] = true;
     }
   }
 
-  for (const k in a) {
-    diff[diff.length] = k
+  for (const key in keys) {
+    diff[diff.length] = key;
   }
 
   return diff;
@@ -40,7 +40,7 @@ export const keyChildrenDiff = (oldChildren, newChildren, parentNode) => {
     for (let i = 0, k = diffedKeys.length; i < k; i++) {
       const key = diffedKeys[i];
 
-      for(var a = 0, b = parentNode.children.length; a < b; a++){
+      for(let a = 0, b = parentNode.children.length; a < b; a++){
         const node = parentNode.children[a];
 
         if(node && node.attributes.key.value === key){
@@ -53,7 +53,7 @@ export const keyChildrenDiff = (oldChildren, newChildren, parentNode) => {
     for (let i = 0, k = diffedKeys.length; i < k; i++) {
       const key = diffedKeys[i];
 
-      for (var a = newChildren.length - 1; a >= 0; a--){
+      for (let a = newChildren.length - 1; a >= 0; a--){
         const node = newChildren[a];
 
         if (String(node.props.key) === key) {
