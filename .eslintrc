@@ -30,6 +30,8 @@
     "no-underscore-dangle": "off",
     "no-unused-vars": ["error", { "vars": "local", "args": "none" }],
     "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }],
-    "prefer-const": "error"
+    "prefer-const": "error",
+    "keyword-spacing": "error",
+    "space-before-blocks": "error"
   }
 }

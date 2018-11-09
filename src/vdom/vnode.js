@@ -20,12 +20,12 @@ export function VNode(tagName, props, children) {
   this.props = props || {};
 
   // handle functional components
-  if(isFunction(this.tagName)){
+  if (isFunction(this.tagName)) {
     const results = new this.tagName(this.props);
     
-    if(isArray(results)){
+    if (isArray(results)) {
       this.children = this.children.concat(results);
-    }else{
+    } else {
       this.children[this.children.length] = results;
     }
   }

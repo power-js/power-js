@@ -3,7 +3,7 @@
  * @param  {Object} e Event object
  * @return {Function} Event listener function
  */
-export const proxyFn = function(e){
+export const proxyFn = function(e) {
   return this.$events[e.type](e);
 };
 
@@ -20,7 +20,7 @@ export const addEventListener = (element, event, handler) => {
   // invoke the callback function in the context of the DOM element
   element.addEventListener(eventType, proxyFn);
 
-  if(!element.$events){
+  if (!element.$events) {
     element.$events = {};
   }
 
