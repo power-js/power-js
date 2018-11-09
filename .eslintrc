@@ -1,0 +1,37 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "plugins": ["prettier"],
+  "extends": ["prettier"],
+  "settings": {
+    "react": {
+      "version": "0.14.9"
+    }
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true,
+      "experimentalObjectRestSpread": true
+    }
+  },
+  "rules": {
+    "consistent-return": "off",
+    "valid-typeof": "error",
+    "no-loop-func": "error",
+    "no-mixed-requires": "off",
+    "no-return-assign": "off",
+    "no-undef": "error",
+    "no-underscore-dangle": "off",
+    "no-unused-vars": ["error", { "vars": "local", "args": "none" }],
+    "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }],
+    "prefer-const": "error",
+    "keyword-spacing": "error",
+    "space-before-blocks": "error"
+  }
+}

@@ -1,0 +1,129 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`vdom #h should cast children that are numbers to strings 1`] = `
+VNode {
+  "children": Array [
+    VNode {
+      "children": Array [
+        "Hello",
+        MyComponent {
+          "_power": true,
+          "name": "MyComponent",
+          "props": Object {},
+          "state": Object {},
+        },
+      ],
+      "props": Object {
+        "power-id": 9,
+      },
+      "tagName": [Function],
+    },
+    "1",
+    MyComponent {
+      "_power": true,
+      "name": "MyComponent",
+      "props": Object {},
+      "state": Object {},
+    },
+  ],
+  "props": Object {
+    "power-id": 10,
+  },
+  "tagName": [Function],
+}
+`;
+
+exports[`vdom #h should drop children that are of type boolean 1`] = `
+VNode {
+  "children": Array [
+    VNode {
+      "children": Array [
+        "Hello",
+        MyComponent {
+          "_power": true,
+          "name": "MyComponent",
+          "props": Object {},
+          "state": Object {},
+        },
+      ],
+      "props": Object {
+        "power-id": 7,
+      },
+      "tagName": [Function],
+    },
+    "",
+    MyComponent {
+      "_power": true,
+      "name": "MyComponent",
+      "props": Object {},
+      "state": Object {},
+    },
+  ],
+  "props": Object {
+    "power-id": 8,
+  },
+  "tagName": [Function],
+}
+`;
+
+exports[`vdom #h should handle processing children of mixed types 1`] = `
+VNode {
+  "children": Array [
+    VNode {
+      "children": Array [
+        VNode {
+          "children": Array [
+            "Hello",
+          ],
+          "props": Object {
+            "power-id": 2,
+          },
+          "tagName": "div",
+        },
+        VNode {
+          "children": Array [
+            VNode {
+              "children": Array [
+                "World",
+              ],
+              "props": Object {
+                "power-id": 3,
+              },
+              "tagName": "span",
+            },
+          ],
+          "props": Object {
+            "power-id": 4,
+          },
+          "tagName": "div",
+        },
+        MyComponent {
+          "_power": true,
+          "name": "MyComponent",
+          "props": Object {},
+          "state": Object {},
+        },
+      ],
+      "props": Object {
+        "power-id": 5,
+      },
+      "tagName": [Function],
+    },
+    "",
+    [Function],
+    MyComponent {
+      "_power": true,
+      "name": "MyComponent",
+      "props": Object {
+        "id": "test",
+      },
+      "state": Object {},
+    },
+  ],
+  "props": Object {
+    "id": "test",
+    "power-id": 6,
+  },
+  "tagName": [Function],
+}
+`;

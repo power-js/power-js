@@ -1,0 +1,20 @@
+*.
+
+# configs
+!.babelrc
+!.editorconfig
+!.eslintignore
+!.eslintrc
+!.gitattributes
+!.gitignore
+!.lintstagedrc.json
+!.prettierrc.json
+!.travis.yml
+
+# generated
+node_modules
+.DS_Store
+npm-debug.log
+
+# testing
+coverage
