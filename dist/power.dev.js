@@ -19,82 +19,6 @@
   var POWER_NODE_ATTRIBUTE = 'power-id';
 
   /**
-   * VNode Counter
-   * @type {Number}
-   */
-
-  var counter = 0;
-  /**
-   * Creates a Virtual Node
-   * @public
-   * @param   {String}  tag
-   * @param   {Object}  props
-   * @param   {Array}   children
-   * @returns {Object}
-   */
-
-  function VNode(tagName, props, children) {
-    this.tagName = tagName || 'div';
-    this.children = children || [];
-    this.props = props || {}; // increment counter
-
-    counter += 1; // assign counter to props
-
-    this.props[POWER_NODE_ATTRIBUTE] = counter;
-    return this;
-  }
-
-  /**
-   * Array used to sanitize child nodes
-   * @type {Array}
-   */
-
-  var stack = [];
-  /**
-   * Returns a new virtual node
-   * @param  {String} tagName String containing the elements tag name (i.e. 'div', 'span')
-   * @param  {Object} props   Object containing any attributes defined on the element
-   * @param  {Array}  args    Array of child nodes
-   * @return {Object}         A new virtual node
-   */
-
-  function h(tagName, props) {
-    var children = [];
-
-    for (var i = arguments.length; i-- > 2;) {
-      stack[stack.length] = arguments[i];
-    }
-
-    while (stack.length) {
-      var child = stack.pop();
-
-      if (child && child.pop) {
-        for (var _i = child.length; _i--;) {
-          stack[stack.length] = child[_i];
-        }
-      } else {
-        if (typeof child === 'boolean') {
-          child = null;
-        }
-
-        if (typeof child === 'number') {
-          child = String(child);
-        }
-
-        if (typeof child !== 'function') {
-          if (child === null || child === undefined) {
-            child = '';
-          }
-        }
-
-        children[children.length] = child;
-      }
-    }
-
-    return new VNode(tagName, props, children);
-  }
-
-  /**
    * Determines whether the passed object is a valid element attribute
    * @private
    * @param {HTMLElement} element DOM Element to check the property against
@@ -202,6 +126,93 @@
       isFunction = methods.isFunction,
       isObject = methods.isObject,
       isString = methods.isString;
+
+  /**
+   * VNode Counter
+   * @type {Number}
+   */
+
+  var counter = 0;
+  /**
+   * Creates a Virtual Node
+   * @public
+   * @param   {String}  tag
+   * @param   {Object}  props
+   * @param   {Array}   children
+   * @returns {Object}
+   */
+
+  function VNode(tagName, props, children) {
+    this.tagName = tagName || 'div';
+    this.children = children || [];
+    this.props = props || {}; // handle functional components
+
+    if (isFunction(this.tagName)) {
+      var results = new this.tagName(this.props);
+
+      if (isArray(results)) {
+        this.children = this.children.concat(results);
+      } else {
+        this.children[this.children.length] = results;
+      }
+    } // increment counter
+
+
+    counter += 1; // assign counter to props
+
+    this.props[POWER_NODE_ATTRIBUTE] = counter;
+    return this;
+  }
+
+  /**
+   * Array used to sanitize child nodes
+   * @type {Array}
+   */
+
+  var stack = [];
+  /**
+   * Returns a new virtual node
+   * @param  {String} tagName String containing the elements tag name (i.e. 'div', 'span')
+   * @param  {Object} props   Object containing any attributes defined on the element
+   * @param  {Array}  args    Array of child nodes
+   * @return {Object}         A new virtual node
+   */
+
+  function h(tagName, props) {
+    var children = [];
+
+    for (var i = arguments.length; i-- > 2;) {
+      stack[stack.length] = arguments[i];
+    }
+
+    while (stack.length) {
+      var child = stack.pop();
+
+      if (child && child.pop) {
+        for (var _i = child.length; _i--;) {
+          stack[stack.length] = child[_i];
+        }
+      } else {
+        if (typeof child === 'boolean') {
+          child = null;
+        }
+
+        if (typeof child === 'number') {
+          child = String(child);
+        }
+
+        if (typeof child !== 'function') {
+          if (child === null || child === undefined) {
+            child = '';
+          }
+        }
+
+        children[children.length] = child;
+      }
+    }
+
+    return new VNode(tagName, props, children);
+  }
 
   /**
    * Renders a component or vnodes in the given root
@@ -769,7 +780,8 @@
       key: "create",
       value: function create() {
         // creating the component root element
-        this.node = document.createElement(this.name);
+        this.node = document.createElement(this.name); // set power-component prop
+
         this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true); // convert props into proxy object
 
         this.props = proxy(this, this.props); // get the vnode construct

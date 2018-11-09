@@ -6,6 +6,12 @@ VNode {
     VNode {
       "children": Array [
         "Hello",
+        MyComponent {
+          "_power": true,
+          "name": "MyComponent",
+          "props": Object {},
+          "state": Object {},
+        },
       ],
       "props": Object {
         "power-id": 9,
@@ -13,6 +19,12 @@ VNode {
       "tagName": [Function],
     },
     "1",
+    MyComponent {
+      "_power": true,
+      "name": "MyComponent",
+      "props": Object {},
+      "state": Object {},
+    },
   ],
   "props": Object {
     "power-id": 10,
@@ -27,6 +39,12 @@ VNode {
     VNode {
       "children": Array [
         "Hello",
+        MyComponent {
+          "_power": true,
+          "name": "MyComponent",
+          "props": Object {},
+          "state": Object {},
+        },
       ],
       "props": Object {
         "power-id": 7,
@@ -34,6 +52,12 @@ VNode {
       "tagName": [Function],
     },
     "",
+    MyComponent {
+      "_power": true,
+      "name": "MyComponent",
+      "props": Object {},
+      "state": Object {},
+    },
   ],
   "props": Object {
     "power-id": 8,
@@ -73,6 +97,12 @@ VNode {
           },
           "tagName": "div",
         },
+        MyComponent {
+          "_power": true,
+          "name": "MyComponent",
+          "props": Object {},
+          "state": Object {},
+        },
       ],
       "props": Object {
         "power-id": 5,
@@ -81,6 +111,14 @@ VNode {
     },
     "",
     [Function],
+    MyComponent {
+      "_power": true,
+      "name": "MyComponent",
+      "props": Object {
+        "id": "test",
+      },
+      "state": Object {},
+    },
   ],
   "props": Object {
     "id": "test",

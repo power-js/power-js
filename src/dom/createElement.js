@@ -1,6 +1,5 @@
 import { decorateElement } from './decorateElement';
 import { appendChildren } from './appendChildren';
-
 /**
  * converts a vnode into an html element
  * @private

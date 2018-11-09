@@ -56,6 +56,7 @@ export class Component {
     // creating the component root element
     this.node = document.createElement(this.name);
 
+    // set power-component prop
     this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true);
 
     // convert props into proxy object
