@@ -1,6 +1,6 @@
 <p align="center" ><a href="https://github.com/power-js/power-js"><img alt="PowerJS" src="https://user-images.githubusercontent.com/1918732/47975313-295a4a00-e062-11e8-8ae7-2e6124405f9c.png" width="500" height="auto"/></a></p>
 
-<p align="center"><strong>A powerful JavaScript library for building web components</strong></p>
+<p align="center"><strong>A powerful JavaScript library for creating modern UIs</strong></p>
 
 <p align="center">  
   <img src="https://img.shields.io/github/license/power-js/power-js.svg">
@@ -13,7 +13,7 @@
 ---
 
 ## Why PowerJS?
-This library was designed as a lightweight React-like solution with a smaller footprint and faster performance. This is **not** a React replacement nor was it ever intended to be. Our goal was to provide a similar interface to prevent having to learn yet another front-end library. 
+This library was designed as a lightweight React-like solution with a smaller footprint and faster performance. This is **not** a React replacement nor was it ever intended to be. Our goal was to provide a similar interface to prevent having to learn yet another front-end library.
 
 We aren't sure what this library will evolve into but we wanted to start with "good bones". Please help us define what this can be by opening some PRs or submitting ideas!
 
