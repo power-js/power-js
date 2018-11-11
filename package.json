@@ -1,7 +1,7 @@
 {
   "name": "@power-js/core",
   "version": "1.0.0-alpha",
-  "description": "A powerful JavaScript library for building web components.",
+  "description": "A powerful JavaScript library for creating modern UIs",
   "main": "dist/power.js",
   "scripts": {
     "precommit": "lint-staged",
