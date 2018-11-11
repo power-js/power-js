@@ -7,11 +7,8 @@ import { Component } from './component/component';
  * @public
  * @type {String}
  */
+const version = '1.0.0-alpha';
 
-const version = '1.0.0-beta';
+export default { h, render, Component, version };
 
-const Power = { h, render, Component, version };
-
-export default Power;
-
-export { render, Component, version };
+export { h, render, Component, version };

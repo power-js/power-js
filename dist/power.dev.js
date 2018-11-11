@@ -913,15 +913,16 @@
    * @type {String}
    */
 
-  var version = '1.0.0-beta';
-  var Power = {
+  var version = '1.0.0-alpha';
+  var index = {
     h: h,
     render: render,
     Component: Component,
     version: version
   };
 
-  exports.default = Power;
+  exports.default = index;
+  exports.h = h;
   exports.render = render;
   exports.Component = Component;
   exports.version = version;
