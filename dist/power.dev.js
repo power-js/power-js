@@ -382,7 +382,7 @@
 
   var createElement = function createElement(vnode) {
     // create the element
-    var element = document.createElement(vnode.tagName.name || vnode.tagName);
+    var element = document.createElement(vnode.tagName);
     var fragment = document.createDocumentFragment();
 
     if (vnode.children && vnode.children.length) {
