@@ -1,5 +1,5 @@
 import { isHtml, isVNode, isFunction } from '../utils/is';
-
+import { createElement } from '../dom/createElement';
 /**
  * Renders a component or vnodes in the given root
  * @public
@@ -25,8 +25,8 @@ export const render = (model, root) => {
     model.componentWillMount(model);
   }
 
-  // convert the vnodes / component into real dom elements
-  const domTree = model.create();
+  // convert the vnodes or component into real dom elements
+  const domTree = model._power ? model.create() : createElement(model);
 
   if (isHtml(domTree)) {
     _root.appendChild(domTree);

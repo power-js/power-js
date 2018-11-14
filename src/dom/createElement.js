@@ -9,7 +9,7 @@ import { appendChildren } from './appendChildren';
  */
 export const createElement = (vnode) => {
   // create the element
-  const element = document.createElement(vnode.tagName.name || vnode.tagName);
+  const element = document.createElement(vnode.tagName);
   const fragment = document.createDocumentFragment();
 
   if (vnode.children && vnode.children.length) {
