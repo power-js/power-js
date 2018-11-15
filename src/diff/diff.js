@@ -1,8 +1,8 @@
-import { propsDiff } from './propsDiff';
-import { childrenDiff } from './childrenDiff';
-import { POWER_NODE_ATTRIBUTE } from '../constants';
-import { keyChildrenDiff } from './keyChildrenDiff';
+import { diffProps } from './diffProps';
+import { diffChildren } from './diffChildren';
+import { diffChildrenByKey } from './diffChildrenByKey';
 import { isKeyedList } from '../utils/is';
+import { POWER_NODE_ATTRIBUTE } from '../constants';
 
 /**
  * working on difference between 2 vnodes
@@ -30,11 +30,11 @@ export const diff = (oldVNode, newVNode, Component) => {
 
   // compare children
   if (isKeyedList(oldChildren, newChildren)) {
-    keyChildrenDiff(oldChildren, newChildren, element);
+    diffChildrenByKey(oldChildren, newChildren, element);
   } else {
-    childrenDiff(oldChildren, newChildren, element, Component);
+    diffChildren(oldChildren, newChildren, element, Component);
   }
 
   // compare props
-  propsDiff(oldVNode.props, newVNode.props, element);
+  diffProps(oldVNode.props, newVNode.props, element);
 };

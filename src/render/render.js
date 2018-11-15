@@ -9,6 +9,7 @@ import { createElement } from '../dom/createElement';
 export const render = (model, root) => {
   // assign document.body if no root is given
   const _root = root || document.body;
+  
   // JSX will transform Component into functions
   if (isFunction(model.tagName)) {
     // TODO: better checking

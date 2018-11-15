@@ -5,18 +5,37 @@
 }(this, (function (exports) { 'use strict';
 
   /**
-   * Data power attribute
+   * Element attribute `power-id`
    * @private
    * @type {String}
    */
-  var POWER_COMPONENT_ATTRIBUTE = 'power-component';
+  var POWER_NODE_ATTRIBUTE = 'power-id';
+
   /**
-   * data node id
-   * @private
-   * @type {String}
+   * VNode Counter
+   * @type {Number}
    */
 
-  var POWER_NODE_ATTRIBUTE = 'power-id';
+  var counter = 0;
+  /**
+   * Creates a Virtual Node
+   * @public
+   * @param   {String}  tag
+   * @param   {Object}  props
+   * @param   {Array}   children
+   * @returns {Object}
+   */
+
+  function VNode(tagName, props, children) {
+    this.tagName = tagName || 'div';
+    this.children = children || [];
+    this.props = props || {}; // increment counter
+
+    counter += 1; // assign counter to props
+
+    this.props[POWER_NODE_ATTRIBUTE] = counter;
+    return this;
+  }
 
   /**
    * Determines whether the passed object is a valid element attribute
@@ -68,7 +87,7 @@
    * @return {Boolean}
    */
   var isKeyedList = function isKeyedList(oldChildren, newChildren) {
-    return newChildren.length && newChildren[0].props && newChildren[0].props.key || oldChildren.length && oldChildren[0].props && oldChildren[0].props.key;
+    return newChildren.length && newChildren[0].props && newChildren[0].props.key !== undefined || oldChildren.length && oldChildren[0].props && oldChildren[0].props.key !== undefined;
   };
 
   /**
@@ -123,47 +142,11 @@
     };
   });
   var isArray = methods.isArray,
+      isBoolean = methods.isBoolean,
       isFunction = methods.isFunction,
+      isNumber = methods.isNumber,
       isObject = methods.isObject,
       isString = methods.isString;
-
-  /**
-   * VNode Counter
-   * @type {Number}
-   */
-
-  var counter = 0;
-  /**
-   * Creates a Virtual Node
-   * @public
-   * @param   {String}  tag
-   * @param   {Object}  props
-   * @param   {Array}   children
-   * @returns {Object}
-   */
-
-  function VNode(tagName, props, children) {
-    this.tagName = tagName || 'div';
-    this.children = children || [];
-    this.props = props || {}; // handle classes and functional components
-
-    if (isFunction(this.tagName)) {
-      var output = new this.tagName(this.props); // handle class
-
-      if (output.render) {
-        return output.render();
-      } // handle functional component
-
-
-      return output;
-    } // increment counter
-
-
-    counter += 1; // assign counter to props
-
-    this.props[POWER_NODE_ATTRIBUTE] = counter;
-    return this;
-  }
 
   /**
    * Array used to sanitize child nodes
@@ -171,6 +154,12 @@
    */
 
   var stack = [];
+  /**
+   * FOR DEMO OF ISSUE - REMOVE
+   * @type {Boolean}
+   */
+
+  var initial = true;
   /**
    * Returns a new virtual node
    * @param  {String} tagName String containing the elements tag name (i.e. 'div', 'span')
@@ -180,7 +169,34 @@
    */
 
   function h(tagName, props) {
-    var children = [];
+    var children = []; // if we already have a vnode just return it
+
+    if (isVNode(tagName)) {
+      return tagName;
+    } // handle classes and functional components
+
+
+    if (isFunction(tagName)) {
+      var output = new tagName(props); // if we have a valid vnode return it
+
+      if (isVNode(tagName)) {
+        return tagName;
+      } // handle class
+
+
+      if (output.render) {
+        // NEED TO FIX THIS
+        // if the initial render is done with a JSX tag this breaks the props chain
+        if (!initial) {
+          // output nodes
+          return output.render();
+        }
+
+        initial = false;
+      }
+
+      return output;
+    }
 
     for (var i = arguments.length; i-- > 2;) {
       stack[stack.length] = arguments[i];
@@ -194,15 +210,15 @@
           stack[stack.length] = child[_i];
         }
       } else {
-        if (typeof child === 'boolean') {
+        if (isBoolean(child)) {
           child = null;
         }
 
-        if (typeof child === 'number') {
+        if (isNumber(child)) {
           child = String(child);
         }
 
-        if (typeof child !== 'function') {
+        if (!isFunction(child)) {
           if (child === null || child === undefined) {
             child = '';
           }
@@ -328,23 +344,22 @@
   /**
    * append Element string
    * @private
-   * @param {HTMLElement} element
+   * @param {HTMLElement} parentNode
    * @param {String}      text
    */
-  var appendElementText = function appendElementText(element, text) {
-    element.appendChild(document.createTextNode(text));
+  var appendElementText = function appendElementText(parentNode, text) {
+    parentNode.appendChild(document.createTextNode(text));
   };
 
   /**
    * appends a vnode
    * @private
-   * @param {HTMLElement} element
-   * @param {Object} vnode
-   * @param {Class} Component
+   * @param {HTMLElement} parentNode
+   * @param {Object}      vnode
    */
 
-  var appendElementVnode = function appendElementVnode(parent, vnode) {
-    parent.appendChild(createElement(vnode));
+  var appendElementVnode = function appendElementVnode(parentNode, vnode) {
+    parentNode.appendChild(createElement(vnode));
   };
 
   /**
@@ -490,7 +505,7 @@
    * @param {HTMLElement} element
    */
 
-  var propsDiff = function propsDiff(prevProps, nextProps, element) {
+  var diffProps = function diffProps(prevProps, nextProps, element) {
     // prevent unneeded iterations
     if (isEqual(prevProps, nextProps)) {
       return;
@@ -520,7 +535,7 @@
    * @param {Class}       Component
    */
 
-  var childrenDiff = function childrenDiff(oldChildren, newChildren, element, Component) {
+  var diffChildren = function diffChildren(oldChildren, newChildren, element, Component) {
     for (var i = 0, k = newChildren.length; i < k; i++) {
       var child = newChildren[i];
 
@@ -546,7 +561,7 @@
       }
 
       if (child.pop && oldChildren[i] && oldChildren[i].pop) {
-        childrenDiff(oldChildren[i], child, element, Component);
+        diffChildren(oldChildren[i], child, element, Component);
       }
     }
 
@@ -563,12 +578,14 @@
   var diffChildrenKeys = function diffChildrenKeys(first, second) {
     var keys = [];
     var diff = [];
+    var firstSize = first.length;
+    var secondSize = second.length;
 
-    for (var i = 0, k = first.length; i < k; i++) {
+    for (var i = 0; i < firstSize; i++) {
       keys[first[i]] = true;
     }
 
-    for (var _i = 0, _k = second.length; _i < _k; _i++) {
+    for (var _i = 0; _i < secondSize; _i++) {
       if (keys[second[_i]]) {
         delete keys[second[_i]];
       } else {
@@ -582,6 +599,45 @@
 
     return diff;
   };
+
+  var count = 0;
+
+  var recusiveTextDiff = function recusiveTextDiff(oldChildren, newChildren, collection) {
+    for (var i = 0, k = oldChildren.length; i < k; i++) {
+      var oldItem = oldChildren[i];
+      var newItem = newChildren[i];
+
+      if (typeof oldItem === 'string') {
+        if (oldItem !== newItem) {
+          collection[collection.length] = count;
+        }
+      }
+
+      if (oldItem.children) {
+        recusiveTextDiff(oldItem.children, newItem.children, collection);
+      }
+    }
+
+    return collection;
+  };
+
+  var diffChildrenText = function diffChildrenText(oldChildren, newChildren) {
+    var collection = [];
+    count = 0;
+
+    for (var i = 0, k = oldChildren.length; i < k; i++) {
+      var oldItem = oldChildren[i];
+      var newItem = newChildren[i];
+
+      if (oldItem.children) {
+        recusiveTextDiff(oldItem.children, newItem.children, collection);
+        count++;
+      }
+    }
+
+    return collection;
+  };
+
   /**
    * diffing keyed lists
    * @param {Array}       oldChildren
@@ -589,8 +645,7 @@
    * @param {DOM Element} parentNode
    */
 
-
-  var keyChildrenDiff = function keyChildrenDiff(oldChildren, newChildren, parentNode) {
+  var diffChildrenByKey = function diffChildrenByKey(oldChildren, newChildren, parentNode) {
     // get every old key
     var oldKeys = oldChildren.map(function (child) {
       return child.props.key;
@@ -598,34 +653,57 @@
 
     var newKeys = newChildren.map(function (child) {
       return child.props.key;
-    }); // get the diff on keys
+    }); // get the keys diff
 
-    var diffedKeys = diffChildrenKeys(oldKeys, newKeys);
+    var diffedKeys = diffChildrenKeys(oldKeys, newKeys); // cache the diff length
 
-    if (oldKeys.length > newKeys.length) {
-      for (var i = 0, k = diffedKeys.length; i < k; i++) {
-        var key = diffedKeys[i];
+    var size = diffedKeys.length; // if there wasn't an additional or subtraction to the children
 
-        for (var a = 0, b = parentNode.children.length; a < b; a++) {
-          var node = parentNode.children[a];
+    if (!diffedKeys.length) {
+      // compare the contents of the children
+      diffedKeys = diffChildrenText(oldChildren, newChildren);
+      size = diffedKeys.length;
 
-          if (node && node.attributes.key.value === key) {
-            parentNode.removeChild(node);
-            break;
+      for (var i = 0; i < size; i++) {
+        // replace the node with the new node
+        parentNode.replaceChild(createElement(newChildren[diffedKeys[i]]), parentNode.children[diffedKeys[i]]);
+      }
+    } else {
+      if (diffedKeys.length && oldKeys.length === newKeys.length) {
+        var _size = parentNode.children.length;
+
+        for (var _i = 0; _i < _size; _i++) {
+          parentNode.replaceChild(createElement(newChildren[_i]), parentNode.children[_i]);
+        }
+      } else if (oldKeys.length > newKeys.length) {
+        for (var _i2 = 0; _i2 < size; _i2++) {
+          var key = diffedKeys[_i2];
+
+          for (var a = 0, b = parentNode.children.length; a < b; a++) {
+            var node = parentNode.children[a];
+
+            if (node && node.attributes.key.value === key) {
+              parentNode.removeChild(node);
+              break;
+            }
           }
         }
-      }
-    } else if (oldKeys.length < newKeys.length) {
-      for (var _i2 = 0, _k2 = diffedKeys.length; _i2 < _k2; _i2++) {
-        var _key = diffedKeys[_i2];
+      } else if (oldKeys.length < newKeys.length) {
+        var fragment = document.createDocumentFragment();
 
-        for (var _a = newChildren.length - 1; _a >= 0; _a--) {
-          var _node = newChildren[_a];
+        for (var _i3 = 0; _i3 < size; _i3++) {
+          var _key = diffedKeys[_i3];
 
-          if (String(_node.props.key) === _key) {
-            parentNode.appendChild(createElement(_node));
-            break;
+          for (var _a = newChildren.length - 1; _a >= 0; _a--) {
+            var _node = newChildren[_a];
+
+            if (String(_node.props.key) === _key) {
+              fragment.appendChild(createElement(_node));
+              break;
+            }
           }
+
+          parentNode.appendChild(fragment);
         }
       }
     }
@@ -655,13 +733,13 @@
     var oldChildren = oldVNode.children; // compare children
 
     if (isKeyedList(oldChildren, newChildren)) {
-      keyChildrenDiff(oldChildren, newChildren, element);
+      diffChildrenByKey(oldChildren, newChildren, element);
     } else {
-      childrenDiff(oldChildren, newChildren, element, Component);
+      diffChildren(oldChildren, newChildren, element, Component);
     } // compare props
 
 
-    propsDiff(oldVNode.props, newVNode.props, element);
+    diffProps(oldVNode.props, newVNode.props, element);
   };
 
   var ARRAY_MODIFIERS = ['push', 'pop', 'shift', 'unshift', 'splice'];
@@ -689,7 +767,7 @@
 
                   if (ARRAY_MODIFIERS.includes(prop)) {
                     if (component.shouldComponentUpdate(component.props, component.state)) {
-                      component.update();
+                      component.rerender();
                     }
                   }
 
@@ -719,7 +797,7 @@
           // set value
           target[prop] = value; // update component
 
-          component.update();
+          component.rerender();
         } // return true to indicate that assignment succeeded
 
 
@@ -780,16 +858,13 @@
     _createClass(Component, [{
       key: "create",
       value: function create() {
-        // creating the component root element
-        this.node = document.createElement(this.name); // set power-component prop
-
-        this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true); // convert props into proxy object
-
+        // convert props into proxy object
         this.props = proxy(this, this.props); // get the vnode construct
 
-        this.componentVDom = this.render(); // get the template by call the render
+        this.componentVDom = this.render(); // create a ref to the element
 
-        this.node.appendChild(createElement(this.componentVDom, this));
+        this.node = createElement(this.componentVDom, this); // return the element
+
         return this.node;
       }
     }, {
@@ -833,7 +908,7 @@
 
         this.state = newState; // update the component
 
-        this.update();
+        this.rerender();
 
         if (isFunction(updateCallback)) {
           updateCallback.call(this);
@@ -847,20 +922,20 @@
     }, {
       key: "forceUpdate",
       value: function forceUpdate(callback) {
-        this.update();
+        this.rerender();
 
         if (isFunction(callback)) {
           callback.call(this);
         }
       }
       /**
-       * updates the component
+       * Rerenders the component
        * @public
        */
 
     }, {
-      key: "update",
-      value: function update() {
+      key: "rerender",
+      value: function rerender() {
         if (this.componentWillUpdate) {
           this.componentWillUpdate(this);
         }
