@@ -68,7 +68,7 @@
    * @return {Boolean}
    */
   var isKeyedList = function isKeyedList(oldChildren, newChildren) {
-    return newChildren.length && newChildren[0].props && newChildren[0].props.key || oldChildren.length && oldChildren[0].props && oldChildren[0].props.key;
+    return newChildren.length && newChildren[0].props && newChildren[0].props.key !== undefined || oldChildren.length && oldChildren[0].props && oldChildren[0].props.key !== undefined;
   };
 
   /**
@@ -563,12 +563,14 @@
   var diffChildrenKeys = function diffChildrenKeys(first, second) {
     var keys = [];
     var diff = [];
+    var firstSize = first.length;
+    var secondSize = second.length;
 
-    for (var i = 0, k = first.length; i < k; i++) {
+    for (var i = 0; i < firstSize; i++) {
       keys[first[i]] = true;
     }
 
-    for (var _i = 0, _k = second.length; _i < _k; _i++) {
+    for (var _i = 0; _i < secondSize; _i++) {
       if (keys[second[_i]]) {
         delete keys[second[_i]];
       } else {
@@ -598,33 +600,44 @@
 
     var newKeys = newChildren.map(function (child) {
       return child.props.key;
-    }); // get the diff on keys
+    });
 
-    var diffedKeys = diffChildrenKeys(oldKeys, newKeys);
+    if (oldKeys.length === newKeys.length) {
+      var size = parentNode.children.length;
 
-    if (oldKeys.length > newKeys.length) {
-      for (var i = 0, k = diffedKeys.length; i < k; i++) {
-        var key = diffedKeys[i];
+      for (var i = 0; i < size; i++) {
+        parentNode.replaceChild(createElement(newChildren[i]), parentNode.children[i]);
+      }
+    } else {
+      // get the keys diff
+      var diffedKeys = diffChildrenKeys(oldKeys, newKeys); // cache the diff length
 
-        for (var a = 0, b = parentNode.children.length; a < b; a++) {
-          var node = parentNode.children[a];
+      var _size = diffedKeys.length;
 
-          if (node && node.attributes.key.value === key) {
-            parentNode.removeChild(node);
-            break;
+      if (oldKeys.length > newKeys.length) {
+        for (var _i2 = 0; _i2 < _size; _i2++) {
+          var key = diffedKeys[_i2];
+
+          for (var a = 0, b = parentNode.children.length; a < b; a++) {
+            var node = parentNode.children[a];
+
+            if (node && node.attributes.key.value === key) {
+              parentNode.removeChild(node);
+              break;
+            }
           }
         }
-      }
-    } else if (oldKeys.length < newKeys.length) {
-      for (var _i2 = 0, _k2 = diffedKeys.length; _i2 < _k2; _i2++) {
-        var _key = diffedKeys[_i2];
+      } else if (oldKeys.length < newKeys.length) {
+        for (var _i3 = 0; _i3 < _size; _i3++) {
+          var _key = diffedKeys[_i3];
 
-        for (var _a = newChildren.length - 1; _a >= 0; _a--) {
-          var _node = newChildren[_a];
+          for (var _a = newChildren.length - 1; _a >= 0; _a--) {
+            var _node = newChildren[_a];
 
-          if (String(_node.props.key) === _key) {
-            parentNode.appendChild(createElement(_node));
-            break;
+            if (String(_node.props.key) === _key) {
+              parentNode.appendChild(createElement(_node));
+              break;
+            }
           }
         }
       }
