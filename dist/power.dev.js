@@ -128,26 +128,6 @@
       isString = methods.isString;
 
   /**
-   * Shallow copies all properties from the config object to the target object
-   * @param  {Object} target    The receiving object you want to apply the source objects to
-   * @param  {Object} arguments The source object(s) containing the new or updated properties
-   * @return {Object}           The target object
-   */
-  var extend = function extend(target) {
-    var sources = [].slice.call(arguments, 1);
-
-    for (var i = 0, k = sources.length; i < k; i++) {
-      var props = sources[i];
-
-      for (var prop in props) {
-        target[prop] = props[prop];
-      }
-    }
-
-    return target;
-  };
-
-  /**
    * VNode Counter
    * @type {Number}
    */
@@ -176,7 +156,8 @@
 
 
       return output;
-    }
+    } // increment counter
+
 
     counter += 1; // assign counter to props
 
@@ -481,6 +462,26 @@
   }
 
   /**
+   * Shallow copies all properties from the config object to the target object
+   * @param  {Object} target    The receiving object you want to apply the source objects to
+   * @param  {Object} arguments The source object(s) containing the new or updated properties
+   * @return {Object}           The target object
+   */
+  var extend = function extend(target) {
+    var sources = [].slice.call(arguments, 1);
+
+    for (var i = 0, k = sources.length; i < k; i++) {
+      var props = sources[i];
+
+      for (var prop in props) {
+        target[prop] = props[prop];
+      }
+    }
+
+    return target;
+  };
+
+  /**
    * checks out the difference between 2 objects
    * and merges it into the component element
    * @private
@@ -562,12 +563,14 @@
   var diffChildrenKeys = function diffChildrenKeys(first, second) {
     var keys = [];
     var diff = [];
+    var firstSize = first.length;
+    var secondSize = second.length;
 
-    for (var i = 0, k = first.length; i < k; i++) {
+    for (var i = 0; i < firstSize; i++) {
       keys[first[i]] = true;
     }
 
-    for (var _i = 0, _k = second.length; _i < _k; _i++) {
+    for (var _i = 0; _i < secondSize; _i++) {
       if (keys[second[_i]]) {
         delete keys[second[_i]];
       } else {
@@ -597,21 +600,22 @@
 
     var newKeys = newChildren.map(function (child) {
       return child.props.key;
-    }); // console.log(oldKeys.length, newKeys.length);
+    });
 
     if (oldKeys.length === newKeys.length) {
-      // while(parentNode.firstChild){
-      //   parentNode.removeChild(parentNode.firstChild);
-      // }
-      for (var i = 0, k = parentNode.children.length; i < k; i++) {
+      var size = parentNode.children.length;
+
+      for (var i = 0; i < size; i++) {
         parentNode.replaceChild(createElement(newChildren[i]), parentNode.children[i]);
       }
     } else {
-      // get the diff on keys
-      var diffedKeys = diffChildrenKeys(oldKeys, newKeys);
+      // get the keys diff
+      var diffedKeys = diffChildrenKeys(oldKeys, newKeys); // cache the diff length
+
+      var _size = diffedKeys.length;
 
       if (oldKeys.length > newKeys.length) {
-        for (var _i2 = 0, _k2 = diffedKeys.length; _i2 < _k2; _i2++) {
+        for (var _i2 = 0; _i2 < _size; _i2++) {
           var key = diffedKeys[_i2];
 
           for (var a = 0, b = parentNode.children.length; a < b; a++) {
@@ -624,7 +628,7 @@
           }
         }
       } else if (oldKeys.length < newKeys.length) {
-        for (var _i3 = 0, _k3 = diffedKeys.length; _i3 < _k3; _i3++) {
+        for (var _i3 = 0; _i3 < _size; _i3++) {
           var _key = diffedKeys[_i3];
 
           for (var _a = newChildren.length - 1; _a >= 0; _a--) {
@@ -661,9 +665,7 @@
 
     var element = Component.node.querySelector("[".concat(POWER_NODE_ATTRIBUTE, "=\"").concat(powerId, "\"]"));
     var newChildren = newVNode.children;
-    var oldChildren = oldVNode.children; // console.log(newChildren, oldChildren);
-    //
-    // compare children
+    var oldChildren = oldVNode.children; // compare children
 
     if (isKeyedList(oldChildren, newChildren)) {
       keyChildrenDiff(oldChildren, newChildren, element);
