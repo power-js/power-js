@@ -1,5 +1,6 @@
 import { POWER_NODE_ATTRIBUTE } from '../constants';
 import { isFunction } from '../utils/is';
+
 /**
  * VNode Counter
  * @type {Number}

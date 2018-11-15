@@ -33,32 +33,39 @@ export const keyChildrenDiff = (oldChildren, newChildren, parentNode) => {
   const oldKeys = oldChildren.map((child) => child.props.key);
   // get every new key
   const newKeys = newChildren.map((child) => child.props.key);
-  // get the diff on keys
-  const diffedKeys = diffChildrenKeys(oldKeys, newKeys);
 
-  if (oldKeys.length > newKeys.length) {
-    for (let i = 0, k = diffedKeys.length; i < k; i++) {
-      const key = diffedKeys[i];
+  if (oldKeys.length === newKeys.length) {
+    for (var i = 0, k = parentNode.children.length; i < k; i++) {
+      parentNode.replaceChild(createElement(newChildren[i]), parentNode.children[i]);
+    }
+  } else {
+    // get the diff on keys
+    const diffedKeys = diffChildrenKeys(oldKeys, newKeys);
 
-      for (let a = 0, b = parentNode.children.length; a < b; a++) {
-        const node = parentNode.children[a];
+    if (oldKeys.length > newKeys.length) {
+      for (let i = 0, k = diffedKeys.length; i < k; i++) {
+        const key = diffedKeys[i];
 
-        if (node && node.attributes.key.value === key) {
-          parentNode.removeChild(node);
-          break;
+        for (let a = 0, b = parentNode.children.length; a < b; a++) {
+          const node = parentNode.children[a];
+
+          if (node && node.attributes.key.value === key) {
+            parentNode.removeChild(node);
+            break;
+          }
         }
       }
-    }
-  } else if (oldKeys.length < newKeys.length) {
-    for (let i = 0, k = diffedKeys.length; i < k; i++) {
-      const key = diffedKeys[i];
+    } else if (oldKeys.length < newKeys.length) {
+      for (let i = 0, k = diffedKeys.length; i < k; i++) {
+        const key = diffedKeys[i];
 
-      for (let a = newChildren.length - 1; a >= 0; a--) {
-        const node = newChildren[a];
+        for (let a = newChildren.length - 1; a >= 0; a--) {
+          const node = newChildren[a];
 
-        if (String(node.props.key) === key) {
-          parentNode.appendChild(createElement(node));
-          break;
+          if (String(node.props.key) === key) {
+            parentNode.appendChild(createElement(node));
+            break;
+          }
         }
       }
     }

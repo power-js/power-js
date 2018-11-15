@@ -99,7 +99,6 @@ export class Component {
       // pass current currentState
       newState = newState.call(this, prevState, props);
     }
-
     // merge the new state with the existing
     newState = extend({}, prevState, newState);
 
