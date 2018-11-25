@@ -1,5 +1,4 @@
 import { isHtml, isVNode, isFunction } from '../utils/is';
-import { createElement } from '../dom/createElement';
 /**
  * Renders a component or vnodes in the given root
  * @public
@@ -9,7 +8,7 @@ import { createElement } from '../dom/createElement';
 export const render = (model, root) => {
   // assign document.body if no root is given
   const _root = root || document.body;
-  
+
   // JSX will transform Component into functions
   if (isFunction(model.tagName)) {
     // TODO: better checking
@@ -27,7 +26,7 @@ export const render = (model, root) => {
   }
 
   // convert the vnodes or component into real dom elements
-  const domTree = model._power ? model.create() : createElement(model);
+  const domTree = model.create();
 
   if (isHtml(domTree)) {
     _root.appendChild(domTree);
