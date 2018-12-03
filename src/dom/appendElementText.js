@@ -1,9 +1,9 @@
 /**
  * append Element string
  * @private
- * @param {HTMLElement} element
+ * @param {HTMLElement} parentNode
  * @param {String}      text
  */
-export const appendElementText = (element, text) => {
-  element.appendChild(document.createTextNode(text));
+export const appendElementText = (parentNode, text) => {
+  parentNode.appendChild(document.createTextNode(text));
 };

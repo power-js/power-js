@@ -1,6 +1,5 @@
 import { extend } from '../utils/objects/extend';
 import { isEqual, isFunction, isObject } from '../utils/is';
-import { POWER_COMPONENT_ATTRIBUTE } from '../constants';
 import { createElement } from '../dom/createElement';
 import { diff } from '../diff/diff';
 import { proxy } from './proxy';
@@ -53,21 +52,16 @@ export class Component {
    * @return {Node}
    */
   create() {
-    // creating the component root element
-    this.node = document.createElement(this.name);
-
-    // set power-component prop
-    this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true);
-
     // convert props into proxy object
     this.props = proxy(this, this.props);
 
     // get the vnode construct
     this.componentVDom = this.render();
 
-    // get the template by call the render
-    this.node.appendChild(createElement(this.componentVDom, this));
+    // create a ref to the element
+    this.node = createElement(this.componentVDom, this);
 
+    // return the element
     return this.node;
   }
 
@@ -86,7 +80,6 @@ export class Component {
     // keep a ref to prevState
     const prevState = this.state;
 
-    // prevent update when receiving same state
     if (isEqual(state, prevState)) {
       return;
     }
@@ -99,7 +92,6 @@ export class Component {
       // pass current currentState
       newState = newState.call(this, prevState, props);
     }
-
     // merge the new state with the existing
     newState = extend({}, prevState, newState);
 
@@ -112,7 +104,7 @@ export class Component {
     this.state = newState;
 
     // update the component
-    this.update();
+    this.rerender();
 
     if (isFunction(updateCallback)) {
       updateCallback.call(this);
@@ -124,7 +116,7 @@ export class Component {
    * @public
    */
   forceUpdate(callback) {
-    this.update();
+    this.rerender();
 
     if (isFunction(callback)) {
       callback.call(this);
@@ -132,10 +124,10 @@ export class Component {
   }
 
   /**
-   * updates the component
+   * Rerenders the component
    * @public
    */
-  update() {
+  rerender() {
     if (this.componentWillUpdate) {
       this.componentWillUpdate(this);
     }

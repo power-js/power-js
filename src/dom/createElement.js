@@ -1,5 +1,6 @@
 import { decorateElement } from './decorateElement';
 import { appendChildren } from './appendChildren';
+
 /**
  * converts a vnode into an html element
  * @private
@@ -8,8 +9,7 @@ import { appendChildren } from './appendChildren';
  * @returns {HTMLElement}
  */
 export const createElement = (vnode) => {
-  // create the element
-  const element = document.createElement(vnode.tagName.name || vnode.tagName);
+  const element = document.createElement(vnode.tagName);
   const fragment = document.createDocumentFragment();
 
   if (vnode.children && vnode.children.length) {

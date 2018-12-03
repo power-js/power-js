@@ -13,7 +13,7 @@ import { diff } from './diff';
  * @param {HTMLElement} element
  * @param {Class}       Component
  */
-export const childrenDiff = (oldChildren, newChildren, element, Component) => {
+export const diffChildren = (oldChildren, newChildren, element, Component) => {
   for (let i = 0, k = newChildren.length; i < k; i++) {
     const child = newChildren[i];
 
@@ -43,7 +43,7 @@ export const childrenDiff = (oldChildren, newChildren, element, Component) => {
     }
 
     if (child.pop && oldChildren[i] && oldChildren[i].pop) {
-      childrenDiff(oldChildren[i], child, element, Component);
+      diffChildren(oldChildren[i], child, element, Component);
     }
   }
 

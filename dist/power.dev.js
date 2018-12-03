@@ -5,18 +5,37 @@
 }(this, (function (exports) { 'use strict';
 
   /**
-   * Data power attribute
-   * @private
-   * @type {String}
-   */
-  var POWER_COMPONENT_ATTRIBUTE = 'power-component';
-  /**
    * data node id
    * @private
    * @type {String}
    */
-
   var POWER_NODE_ATTRIBUTE = 'power-id';
+
+  /**
+   * VNode Counter
+   * @type {Number}
+   */
+
+  var counter = 0;
+  /**
+   * Creates a Virtual Node
+   * @public
+   * @param   {String}  tag
+   * @param   {Object}  props
+   * @param   {Array}   children
+   * @returns {Object}
+   */
+
+  function VNode(tagName, props, children) {
+    this.tagName = tagName || 'div';
+    this.children = children || [];
+    this.props = props || {}; // increment counter
+
+    counter += 1; // assign counter to props
+
+    this.props[POWER_NODE_ATTRIBUTE] = counter;
+    return this;
+  }
 
   /**
    * Determines whether the passed object is a valid element attribute
@@ -47,7 +66,7 @@
    * @return {Boolean} Returns true if the passed string is an event, else false
    */
   var isEvent = function isEvent(event) {
-    return (event.startsWith('on') ? event.toLowerCase() : "on".concat(event)) in window;
+    return (event.startsWith('on') ? event.toLowerCase() : 'on' + event) in window;
   };
 
   /**
@@ -68,7 +87,7 @@
    * @return {Boolean}
    */
   var isKeyedList = function isKeyedList(oldChildren, newChildren) {
-    return newChildren.length && newChildren[0].props && newChildren[0].props.key || oldChildren.length && oldChildren[0].props && oldChildren[0].props.key;
+    return newChildren.length && newChildren[0].props && newChildren[0].props.key !== undefined || oldChildren.length && oldChildren[0].props && oldChildren[0].props.key !== undefined;
   };
 
   /**
@@ -116,54 +135,20 @@
   ['Array', 'Boolean', 'Date', 'Error', 'Function', 'Null', 'Number', 'Object', 'RegExp', 'String', 'Undefined'].forEach(function (type) {
     var lcase = type.toLowerCase(); // populate class2type object with type
 
-    class2type["[object ".concat(type, "]")] = lcase; // create isType method
+    class2type['[object ' + type + ']'] = lcase; // create isType method
 
-    methods["is".concat(type)] = function (obj) {
+    methods['is' + type] = function (obj) {
       return typeOf(obj) === lcase;
     };
   });
   var isArray = methods.isArray,
+      isBoolean = methods.isBoolean,
       isFunction = methods.isFunction,
+      isNumber = methods.isNumber,
       isObject = methods.isObject,
       isString = methods.isString;
 
-  /**
-   * VNode Counter
-   * @type {Number}
-   */
-
-  var counter = 0;
-  /**
-   * Creates a Virtual Node
-   * @public
-   * @param   {String}  tag
-   * @param   {Object}  props
-   * @param   {Array}   children
-   * @returns {Object}
-   */
-
-  function VNode(tagName, props, children) {
-    this.tagName = tagName || 'div';
-    this.children = children || [];
-    this.props = props || {}; // handle functional components
-
-    if (isFunction(this.tagName)) {
-      var results = new this.tagName(this.props);
-
-      if (isArray(results)) {
-        this.children = this.children.concat(results);
-      } else {
-        this.children[this.children.length] = results;
-      }
-    } // increment counter
-
-
-    counter += 1; // assign counter to props
-
-    this.props[POWER_NODE_ATTRIBUTE] = counter;
-    return this;
-  }
-
+  var initial = true;
   /**
    * Array used to sanitize child nodes
    * @type {Array}
@@ -179,7 +164,30 @@
    */
 
   function h(tagName, props) {
-    var children = [];
+    var children = []; // if we already have a vnode just return it
+
+    if (isVNode(tagName)) {
+      return tagName;
+    } // handle classes and functional components
+
+
+    if (isFunction(tagName)) {
+      var output = new tagName(props);
+
+      if (isVNode(tagName)) {
+        return tagName;
+      }
+
+      if (output.render) {
+        if (!initial) {
+          return output.render();
+        }
+
+        initial = false;
+      }
+
+      return output;
+    }
 
     for (var i = arguments.length; i-- > 2;) {
       stack[stack.length] = arguments[i];
@@ -193,15 +201,15 @@
           stack[stack.length] = child[_i];
         }
       } else {
-        if (typeof child === 'boolean') {
+        if (isBoolean(child)) {
           child = null;
         }
 
-        if (typeof child === 'number') {
+        if (isNumber(child)) {
           child = String(child);
         }
 
-        if (typeof child !== 'function') {
+        if (!isFunction(child)) {
           if (child === null || child === undefined) {
             child = '';
           }
@@ -223,32 +231,19 @@
 
   var render = function render(model, root) {
     // assign document.body if no root is given
-    var _root = root || document.body; // JSX will transform Component into functions
+    var rootElement = root || document.body;
 
-
-    if (isFunction(model.tagName)) {
-      // TODO: better checking
-      return render(new model.tagName(model.props), _root);
-    } // handle a class being passed in
-
-
-    if (!isVNode(model) && !model._power) {
-      return render(new model(), _root);
-    } // check if model is a component
-
-
-    if (model._power && model.componentWillMount) {
+    if (model.componentWillMount) {
       model.componentWillMount(model);
-    } // convert the vnodes / component into real dom elements
-
-
-    var domTree = model.create();
-
-    if (isHtml(domTree)) {
-      _root.appendChild(domTree);
     }
 
-    if (model._power && model.componentDidMount) {
+    var html = model.create();
+
+    if (isHtml(html)) {
+      rootElement.appendChild(html);
+    }
+
+    if (model.componentDidMount) {
       model.componentDidMount(model);
     }
 
@@ -410,23 +405,22 @@
   /**
    * append Element string
    * @private
-   * @param {HTMLElement} element
+   * @param {HTMLElement} parentNode
    * @param {String}      text
    */
-  var appendElementText = function appendElementText(element, text) {
-    element.appendChild(document.createTextNode(text));
+  var appendElementText = function appendElementText(parentNode, text) {
+    parentNode.appendChild(document.createTextNode(text));
   };
 
   /**
    * appends a vnode
    * @private
-   * @param {HTMLElement} element
-   * @param {Object} vnode
-   * @param {Class} Component
+   * @param {HTMLElement} parentNode
+   * @param {Object}      vnode
    */
 
-  var appendElementVnode = function appendElementVnode(parent, vnode) {
-    parent.appendChild(createElement(vnode));
+  var appendElementVnode = function appendElementVnode(parentNode, vnode) {
+    parentNode.appendChild(createElement(vnode));
   };
 
   /**
@@ -463,8 +457,7 @@
    */
 
   var createElement = function createElement(vnode) {
-    // create the element
-    var element = document.createElement(vnode.tagName.name || vnode.tagName);
+    var element = document.createElement(vnode.tagName);
     var fragment = document.createDocumentFragment();
 
     if (vnode.children && vnode.children.length) {
@@ -489,7 +482,7 @@
    * @param {HTMLElement} element
    */
 
-  var propsDiff = function propsDiff(prevProps, nextProps, element) {
+  var diffProps = function diffProps(prevProps, nextProps, element) {
     // prevent unneeded iterations
     if (isEqual(prevProps, nextProps)) {
       return;
@@ -503,9 +496,9 @@
    * @private
    * @param {HTMLElement}
    */
-  var removeNode = function removeNode(child) {
-    if (child && child.parentNode) {
-      child.parentNode.removeChild(child);
+  var removeNode = function removeNode(node) {
+    if (node && node.parentNode) {
+      node.parentNode.removeChild(node);
     }
   };
 
@@ -519,7 +512,7 @@
    * @param {Class}       Component
    */
 
-  var childrenDiff = function childrenDiff(oldChildren, newChildren, element, Component) {
+  var diffChildren = function diffChildren(oldChildren, newChildren, element, Component) {
     for (var i = 0, k = newChildren.length; i < k; i++) {
       var child = newChildren[i];
 
@@ -545,7 +538,7 @@
       }
 
       if (child.pop && oldChildren[i] && oldChildren[i].pop) {
-        childrenDiff(oldChildren[i], child, element, Component);
+        diffChildren(oldChildren[i], child, element, Component);
       }
     }
 
@@ -562,12 +555,14 @@
   var diffChildrenKeys = function diffChildrenKeys(first, second) {
     var keys = [];
     var diff = [];
+    var firstSize = first.length;
+    var secondSize = second.length;
 
-    for (var i = 0, k = first.length; i < k; i++) {
+    for (var i = 0; i < firstSize; i++) {
       keys[first[i]] = true;
     }
 
-    for (var _i = 0, _k = second.length; _i < _k; _i++) {
+    for (var _i = 0; _i < secondSize; _i++) {
       if (keys[second[_i]]) {
         delete keys[second[_i]];
       } else {
@@ -581,6 +576,45 @@
 
     return diff;
   };
+
+  var count = 0;
+
+  var recusiveTextDiff = function recusiveTextDiff(oldChildren, newChildren, collection) {
+    for (var i = 0, k = oldChildren.length; i < k; i++) {
+      var oldItem = oldChildren[i];
+      var newItem = newChildren[i];
+
+      if (typeof oldItem === 'string') {
+        if (oldItem !== newItem) {
+          collection[collection.length] = count;
+        }
+      }
+
+      if (oldItem.children) {
+        recusiveTextDiff(oldItem.children, newItem.children, collection);
+      }
+    }
+
+    return collection;
+  };
+
+  var diffChildrenText = function diffChildrenText(oldChildren, newChildren) {
+    var collection = [];
+    count = 0;
+
+    for (var i = 0, k = oldChildren.length; i < k; i++) {
+      var oldItem = oldChildren[i];
+      var newItem = newChildren[i];
+
+      if (oldItem.children) {
+        recusiveTextDiff(oldItem.children, newItem.children, collection);
+        count++;
+      }
+    }
+
+    return collection;
+  };
+
   /**
    * diffing keyed lists
    * @param {Array}       oldChildren
@@ -588,8 +622,7 @@
    * @param {DOM Element} parentNode
    */
 
-
-  var keyChildrenDiff = function keyChildrenDiff(oldChildren, newChildren, parentNode) {
+  var diffChildrenByKey = function diffChildrenByKey(oldChildren, newChildren, parentNode) {
     // get every old key
     var oldKeys = oldChildren.map(function (child) {
       return child.props.key;
@@ -597,34 +630,57 @@
 
     var newKeys = newChildren.map(function (child) {
       return child.props.key;
-    }); // get the diff on keys
+    }); // get the keys diff
 
-    var diffedKeys = diffChildrenKeys(oldKeys, newKeys);
+    var diffedKeys = diffChildrenKeys(oldKeys, newKeys); // cache the diff length
 
-    if (oldKeys.length > newKeys.length) {
-      for (var i = 0, k = diffedKeys.length; i < k; i++) {
-        var key = diffedKeys[i];
+    var size = diffedKeys.length; // if there wasn't an additional or subtraction to the children
 
-        for (var a = 0, b = parentNode.children.length; a < b; a++) {
-          var node = parentNode.children[a];
+    if (!diffedKeys.length) {
+      // compare the contents of the children
+      diffedKeys = diffChildrenText(oldChildren, newChildren);
+      size = diffedKeys.length;
 
-          if (node && node.attributes.key.value === key) {
-            parentNode.removeChild(node);
-            break;
+      for (var i = 0; i < size; i++) {
+        // replace the node with the new node
+        parentNode.replaceChild(createElement(newChildren[diffedKeys[i]]), parentNode.children[diffedKeys[i]]);
+      }
+    } else {
+      if (diffedKeys.length && oldKeys.length === newKeys.length) {
+        var _size = parentNode.children.length;
+
+        for (var _i = 0; _i < _size; _i++) {
+          parentNode.replaceChild(createElement(newChildren[_i]), parentNode.children[_i]);
+        }
+      } else if (oldKeys.length > newKeys.length) {
+        for (var _i2 = 0; _i2 < size; _i2++) {
+          var key = diffedKeys[_i2];
+
+          for (var a = 0, b = parentNode.children.length; a < b; a++) {
+            var node = parentNode.children[a];
+
+            if (node && node.attributes.key.value === key) {
+              parentNode.removeChild(node);
+              break;
+            }
           }
         }
-      }
-    } else if (oldKeys.length < newKeys.length) {
-      for (var _i2 = 0, _k2 = diffedKeys.length; _i2 < _k2; _i2++) {
-        var _key = diffedKeys[_i2];
+      } else if (oldKeys.length < newKeys.length) {
+        var fragment = document.createDocumentFragment();
 
-        for (var _a = newChildren.length - 1; _a >= 0; _a--) {
-          var _node = newChildren[_a];
+        for (var _i3 = 0; _i3 < size; _i3++) {
+          var _key = diffedKeys[_i3];
 
-          if (String(_node.props.key) === _key) {
-            parentNode.appendChild(createElement(_node));
-            break;
+          for (var _a = newChildren.length - 1; _a >= 0; _a--) {
+            var _node = newChildren[_a];
+
+            if (String(_node.props.key) === _key) {
+              fragment.appendChild(createElement(_node));
+              break;
+            }
           }
+
+          parentNode.appendChild(fragment);
         }
       }
     }
@@ -654,13 +710,13 @@
     var oldChildren = oldVNode.children; // compare children
 
     if (isKeyedList(oldChildren, newChildren)) {
-      keyChildrenDiff(oldChildren, newChildren, element);
+      diffChildrenByKey(oldChildren, newChildren, element);
     } else {
-      childrenDiff(oldChildren, newChildren, element, Component);
+      diffChildren(oldChildren, newChildren, element, Component);
     } // compare props
 
 
-    propsDiff(oldVNode.props, newVNode.props, element);
+    diffProps(oldVNode.props, newVNode.props, element);
   };
 
   var ARRAY_MODIFIERS = ['push', 'pop', 'shift', 'unshift', 'splice'];
@@ -688,7 +744,7 @@
 
                   if (ARRAY_MODIFIERS.includes(prop)) {
                     if (component.shouldComponentUpdate(component.props, component.state)) {
-                      component.update();
+                      component.rerender();
                     }
                   }
 
@@ -718,7 +774,7 @@
           // set value
           target[prop] = value; // update component
 
-          component.update();
+          component.rerender();
         } // return true to indicate that assignment succeeded
 
 
@@ -779,16 +835,13 @@
     _createClass(Component, [{
       key: "create",
       value: function create() {
-        // creating the component root element
-        this.node = document.createElement(this.name); // set power-component prop
-
-        this.node.setAttribute(POWER_COMPONENT_ATTRIBUTE, true); // convert props into proxy object
-
+        // convert props into proxy object
         this.props = proxy(this, this.props); // get the vnode construct
 
-        this.componentVDom = this.render(); // get the template by call the render
+        this.componentVDom = this.render(); // create a ref to the element
 
-        this.node.appendChild(createElement(this.componentVDom, this));
+        this.node = createElement(this.componentVDom, this); // return the element
+
         return this.node;
       }
     }, {
@@ -808,7 +861,7 @@
       key: "setState",
       value: function setState(state, updateCallback) {
         // keep a ref to prevState
-        var prevState = this.state; // prevent update when receiving same state
+        var prevState = this.state;
 
         if (isEqual(state, prevState)) {
           return;
@@ -832,7 +885,7 @@
 
         this.state = newState; // update the component
 
-        this.update();
+        this.rerender();
 
         if (isFunction(updateCallback)) {
           updateCallback.call(this);
@@ -846,20 +899,20 @@
     }, {
       key: "forceUpdate",
       value: function forceUpdate(callback) {
-        this.update();
+        this.rerender();
 
         if (isFunction(callback)) {
           callback.call(this);
         }
       }
       /**
-       * updates the component
+       * Rerenders the component
        * @public
        */
 
     }, {
-      key: "update",
-      value: function update() {
+      key: "rerender",
+      value: function rerender() {
         if (this.componentWillUpdate) {
           this.componentWillUpdate(this);
         }

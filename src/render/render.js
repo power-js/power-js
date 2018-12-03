@@ -1,4 +1,4 @@
-import { isHtml, isVNode, isFunction } from '../utils/is';
+import { isHtml } from '../utils/is';
 
 /**
  * Renders a component or vnodes in the given root
@@ -8,31 +8,19 @@ import { isHtml, isVNode, isFunction } from '../utils/is';
  */
 export const render = (model, root) => {
   // assign document.body if no root is given
-  const _root = root || document.body;
-  // JSX will transform Component into functions
-  if (isFunction(model.tagName)) {
-    // TODO: better checking
-    return render(new model.tagName(model.props), _root);
-  }
+  const rootElement = root || document.body;
 
-  // handle a class being passed in
-  if (!isVNode(model) && !model._power) {
-    return render(new model(), _root);
-  }
-
-  // check if model is a component
-  if (model._power && model.componentWillMount) {
+  if (model.componentWillMount) {
     model.componentWillMount(model);
   }
 
-  // convert the vnodes / component into real dom elements
-  const domTree = model.create();
+  const html = model.create();
 
-  if (isHtml(domTree)) {
-    _root.appendChild(domTree);
+  if (isHtml(html)) {
+    rootElement.appendChild(html);
   }
 
-  if (model._power && model.componentDidMount) {
+  if (model.componentDidMount) {
     model.componentDidMount(model);
   }
 

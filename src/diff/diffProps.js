@@ -9,7 +9,7 @@ import { decorateElement } from '../dom/decorateElement';
  * @param {Object}      nextProps
  * @param {HTMLElement} element
  */
-export const propsDiff = (prevProps, nextProps, element) => {
+export const diffProps = (prevProps, nextProps, element) => {
   // prevent unneeded iterations
   if (isEqual(prevProps, nextProps)) {
     return;

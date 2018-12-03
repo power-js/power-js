@@ -3,8 +3,8 @@
  * @private
  * @param {HTMLElement}
  */
-export const removeNode = (child) => {
-  if (child && child.parentNode) {
-    child.parentNode.removeChild(child);
+export const removeNode = (node) => {
+  if (node && node.parentNode) {
+    node.parentNode.removeChild(node);
   }
 };

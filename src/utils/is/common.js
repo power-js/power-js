@@ -29,9 +29,9 @@ const methods = {};
 ['Array', 'Boolean', 'Date', 'Error', 'Function', 'Null', 'Number', 'Object', 'RegExp', 'String', 'Undefined'].forEach((type) => {
   const lcase = type.toLowerCase();
   // populate class2type object with type
-  class2type[`[object ${type}]`] = lcase;
+  class2type['[object '+ type + ']'] = lcase;
   // create isType method
-  methods[`is${type}`] = (obj) => typeOf(obj) === lcase;
+  methods['is' + type] = (obj) => typeOf(obj) === lcase;
 });
 
 export const { isArray, isBoolean, isError, isFunction, isNull, isNumber, isObject, isRegExp, isString, isUndefined } = methods;

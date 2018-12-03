@@ -25,7 +25,7 @@ export const proxy = (component, source) => {
 
                 if (ARRAY_MODIFIERS.includes(prop)) {
                   if (component.shouldComponentUpdate(component.props, component.state)) {
-                    component.update();
+                    component.rerender();
                   }
                 }
 
@@ -55,7 +55,7 @@ export const proxy = (component, source) => {
         // set value
         target[prop] = value;
         // update component
-        component.update();
+        component.rerender();
       }
       // return true to indicate that assignment succeeded
       return true;

@@ -25,7 +25,7 @@ We aren't sure what this library will evolve into but we wanted to start with "g
 <br>Library makes use of only 3 primary functions.
 
 **Bundle Size**
-<br>Library is extremely small, just 2.2k (gzipped)
+<br>Library is extremely small, just 2.7k (gzipped)
 
 **No Dependencies**
 <br>A standalone library with no dependencies.
@@ -99,7 +99,7 @@ class Counter extends Component {
   }
 }
 
-render(<Counter counter={0} />, document.body);
+render(<Counter counter={0} />, document.getElementById('app'));
 ```
 
 JS:
@@ -122,7 +122,7 @@ class Counter extends Component {
 
 const myCounter = new Counter({ counter: 0 });
 
-render(myCounter, document.body);
+render(myCounter, document.getElementById('app'));  
 ```
 
 
