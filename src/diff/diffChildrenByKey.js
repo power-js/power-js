@@ -40,8 +40,9 @@ export const diffChildrenByKey = (oldChildren, newChildren, parentNode) => {
 
         for (let a = 0, b = parentNode.children.length; a < b; a++) {
           const node = parentNode.children[a];
+          const attributeKey = node.attributes.key.value;
 
-          if (node && node.attributes.key.value === key) {
+          if (node && attributeKey === key) {
             parentNode.removeChild(node);
             break;
           }

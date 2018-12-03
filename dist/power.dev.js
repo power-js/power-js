@@ -658,8 +658,9 @@
 
           for (var a = 0, b = parentNode.children.length; a < b; a++) {
             var node = parentNode.children[a];
+            var attributeKey = node.attributes.key.value;
 
-            if (node && node.attributes.key.value === key) {
+            if (node && attributeKey === key) {
               parentNode.removeChild(node);
               break;
             }
