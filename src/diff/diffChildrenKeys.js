@@ -1,3 +1,8 @@
+/**
+ * @param {Array} first
+ * @param {Array} second
+ * @return {Array}
+ */
 export const diffChildrenKeys = (first, second) => {
   const keys = [];
   const diff = [];
